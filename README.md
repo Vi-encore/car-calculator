@@ -1,75 +1,77 @@
 # 🚗 Car Calculator Monorepo
 
-Сучасний веб-додаток для розрахунку середньої ціни вживаних автомобілів. Проєкт побудований на архітектурі **Monorepo (Turborepo)** та використовує найсучасніші інструменти для бекенду і фронтенду.
+*Read this in [Ukrainian (Українською)](README.uk.md)*
 
-## 🏗 Архітектура Проєкту
+A modern web application for calculating the average price of used cars. The project is built on a **Monorepo (Turborepo)** architecture and uses cutting-edge tools for both backend and frontend.
 
-Цей репозиторій є монорепозиторієм (Monorepo), що складається з кількох взаємопов'язаних робочих просторів (workspaces):
+## 🏗 Project Architecture
 
-- **`apps/backend`**: REST API сервер на базі **NestJS 11**, PostgreSQL та **Prisma ORM**.
-- **`apps/frontend`**: Клієнтський додаток на базі **React 19**, **Vite** та **Redux Toolkit (RTK Query)**.
-- **`packages/types`**: Спільний пакет із типами та Zod-схемами, який використовується і на бекенді, і на фронтенді (Єдине джерело правди).
-- **`packages/eslint-config`** & **`packages/typescript-config`**: Спільні конфігурації лінтера та TypeScript для підтримання єдиного стилю коду.
+This repository is a monorepo consisting of several interconnected workspaces:
 
-## 🚀 Основний Функціонал (Що вже зроблено)
+- **`apps/backend`**: REST API server powered by **NestJS 11**, PostgreSQL, and **Prisma ORM**.
+- **`apps/frontend`**: Client application powered by **React 19**, **Vite**, and **Redux Toolkit (RTK Query)**.
+- **`packages/types`**: A shared package containing TypeScript types and Zod schemas used by both backend and frontend (Single Source of Truth).
+- **`packages/eslint-config`** & **`packages/typescript-config`**: Shared linter and TypeScript configurations to maintain a consistent code style across the monorepo.
 
-### Бекенд (100% готовність MVP)
-- ✅ **Безпека:** JWT-авторизація (access/refresh токени в HTTP-Only куках), хешування паролів (`bcrypt`).
-- ✅ **Бізнес-логіка:** Математичний алгоритм розрахунку (Interquartile Range - IQR) для відкидання аномальних (фейкових) цін на авто.
-- ✅ **Профіль користувача:** Отримання, оновлення, видалення профілю та зміна пароля.
-- ✅ **Інфраструктура:** Глобальна валідація даних (`zod` + `nestjs-zod`), Swagger-документація, захист від брутфорсу (`throttler`), Pino-логування.
+## 🚀 Core Features (What's Done)
 
-### Фронтенд (В процесі розробки)
-- ⏳ Світлий, "повітряний" преміум дизайн (Vanilla CSS + CSS змінні).
-- ⏳ Валідація форм через `react-hook-form` + `zod`.
-- ⏳ Redux Toolkit та інтеграція з API через RTK Query.
+### Backend (100% MVP Readiness)
+- ✅ **Security:** JWT authentication (access/refresh tokens in HTTP-Only cookies), password hashing (`bcrypt`).
+- ✅ **Business Logic:** Mathematical calculation algorithm (Interquartile Range - IQR) to filter out anomalous (fake) car prices.
+- ✅ **User Profile:** Get, update, delete user profile, and change password.
+- ✅ **Infrastructure:** Global data validation (`zod` + `nestjs-zod`), Swagger API documentation, brute-force protection (`throttler`), Pino logging.
 
-## 🛠 Технологічний Стек
+### Frontend (In Development)
+- ⏳ Light, "airy" premium design (Vanilla CSS + CSS variables).
+- ⏳ Form validation via `react-hook-form` + `zod`.
+- ⏳ Redux Toolkit and API integration via RTK Query.
 
-- **Мова:** TypeScript
-- **Пакетний менеджер:** npm (Workspaces)
-- **Білдер:** Turborepo
+## 🛠 Tech Stack
 
-**Бекенд:**
+- **Language:** TypeScript
+- **Package Manager:** npm (Workspaces)
+- **Builder:** Turborepo
+
+**Backend:**
 - NestJS (v11)
 - Prisma ORM + PostgreSQL
 - Passport.js (JWT)
-- Zod (Валідація)
+- Zod (Validation)
 - Swagger (OpenAPI docs)
 
-**Фронтенд:**
+**Frontend:**
 - React (v19) + Vite
 - Redux Toolkit (RTK Query)
 - React Router (v7)
 - React Hook Form + Zod
 
-## ⚙️ Запуск Проєкту
+## ⚙️ Getting Started
 
-### Попередні вимоги
+### Prerequisites
 - Node.js (v20+)
-- PostgreSQL (локально або через Docker)
+- PostgreSQL (locally or via Docker)
 
-### 1. Встановлення залежностей
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Налаштування бази даних
-Створіть файл `.env` у папці `apps/backend/` (на основі `.env.example`) та вкажіть ваш `DATABASE_URL`. Потім застосуйте міграції:
+### 2. Database Setup
+Create a `.env` file in the `apps/backend/` folder (based on `.env.example`) and specify your `DATABASE_URL`. Then apply the migrations:
 ```bash
 npm run --workspace=apps/backend db:push
 ```
-*(або перейдіть у `apps/backend` і виконайте `npx prisma migrate dev`)*
+*(or navigate to `apps/backend` and run `npx prisma migrate dev`)*
 
-### 3. Запуск розробки (Dev Mode)
-Щоб запустити одночасно і бекенд, і фронтенд за допомогою Turborepo:
+### 3. Start Development (Dev Mode)
+To run both the backend and frontend simultaneously using Turborepo:
 ```bash
 npm run dev
 ```
 
-- **Фронтенд:** [http://localhost:5173](http://localhost:5173)
-- **Бекенд API:** [http://localhost:3000](http://localhost:3000)
-- **Swagger Документація:** [http://localhost:3000/api](http://localhost:3000/api)
+- **Frontend:** [http://localhost:5173](http://localhost:5173)
+- **Backend API:** [http://localhost:3000](http://localhost:3000)
+- **Swagger Documentation:** [http://localhost:3000/api](http://localhost:3000/api)
 
-## 👤 Автори
-Розроблено з любов'ю ❤️
+## 👤 Authors
+Developed with love ❤️
