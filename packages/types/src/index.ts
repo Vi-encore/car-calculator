@@ -11,6 +11,22 @@ export const UserSchema = z.object({
 
 export type User = z.infer<typeof UserSchema>;
 
+// DTO для оновлення профілю (наприклад, імені)
+// Оновлення профілю (всі поля необов'язкові, юзер може змінити щось одне)
+export const UpdateProfileDtoSchema = z.object({
+  name: z.string().min(2, "Мінімум 2 символи").optional(),
+  email: z.string().email("Некоректний email").optional(),
+  avatar: z.string().url("Некоректне посилання на фото").optional(),
+});
+export type UpdateProfileDto = z.infer<typeof UpdateProfileDtoSchema>;
+
+// Зміна пароля
+export const UpdatePasswordDtoSchema = z.object({
+  oldPassword: z.string().min(1, "Введіть старий пароль"),
+  newPassword: z.string().min(8, "Мінімум 8 символів"),
+});
+export type UpdatePasswordDto = z.infer<typeof UpdatePasswordDtoSchema>;
+
 // ─── Auth ─────────────────────────────────────────────────────────────
 
 /** DTO for Login — валідується на фронті (react-hook-form) і на беку (class-validator) */

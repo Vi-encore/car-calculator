@@ -14,6 +14,7 @@ import {
   GLOBAL_THROTTLER_TTL_MS,
 } from './constants/constants';
 import { PricesModule } from './prices/prices.module';
+import { CalculationsModule } from './calculations/calculations.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PricesModule } from './prices/prices.module';
     AuthModule,
     UsersModule,
     PricesModule,
+    CalculationsModule,
   ],
   controllers: [AppController],
   providers: [
