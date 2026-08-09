@@ -56,11 +56,26 @@ export const CreateCalculationDtoSchema = z
     region: z.string().min(1, "Вкажіть регіон"),
     yearFrom: z.number().int().min(1990).max(new Date().getFullYear()),
     yearTo: z.number().int().min(1990).max(new Date().getFullYear()),
+
+    mileageFrom: z.number().int().min(0).optional(),
+    mileageTo: z.number().int().min(0).optional(),
   })
   .refine((d) => d.yearFrom <= d.yearTo, {
     message: "yearFrom не може бути більше yearTo",
     path: ["yearFrom"],
-  });
+  })
+  .refine(
+    (d) => {
+      if (d.mileageFrom !== undefined && d.mileageTo !== undefined) {
+        return d.mileageFrom <= d.mileageTo;
+      }
+      return true;
+    },
+    {
+      message: "mileageFrom не може бути більше mileageTo",
+      path: ["mileageFrom"],
+    },
+  );
 
 export type CreateCalculationDto = z.infer<typeof CreateCalculationDtoSchema>;
 
@@ -73,9 +88,15 @@ export const CalculationSchema = z.object({
   region: z.string(),
   yearFrom: z.number().int(),
   yearTo: z.number().int(),
-  avgPrice: z.number(),
+  avgPrice: z.number().nullable().optional(), // prisma повертає null якщо пусто
   currency: z.string().default("USD"),
-  createdAt: z.string(),
+
+  photoUrl: z.string().nullable().optional(),
+  avgMileage: z.number().int().nullable().optional(),
+  mileageFrom: z.number().int().nullable().optional(),
+  mileageTo: z.number().int().nullable().optional(),
+
+  createdAt: z.string(), // або Date
 });
 
 export type Calculation = z.infer<typeof CalculationSchema>;
@@ -87,6 +108,7 @@ export const PriceItemSchema = z.object({
   year: z.number().int(),
   mileage: z.number().int().optional(),
   source: z.string().optional(),
+  photoUrl: z.string().url().optional(),
 });
 
 export type PriceItem = z.infer<typeof PriceItemSchema>;

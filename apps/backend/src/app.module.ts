@@ -13,6 +13,7 @@ import {
   GLOBAL_THROTTLER_LIMIT,
   GLOBAL_THROTTLER_TTL_MS,
 } from './constants/constants';
+import { PricesModule } from './prices/prices.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import {
     PrismaModule,
     AuthModule,
     UsersModule,
+    PricesModule,
   ],
   controllers: [AppController],
   providers: [

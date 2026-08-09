@@ -47,6 +47,10 @@ model Calculation {
   yearTo Int
   avgPrice Float?
   createdAt DateTime @default(now())
+  photoUrl String?
+  avgMileage Int?
+  mileageFrom Int?
+  mileageTo Int?
 
   // links
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
