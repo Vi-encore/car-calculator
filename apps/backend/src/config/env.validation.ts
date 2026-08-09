@@ -15,6 +15,10 @@ export const EnvSchema = z.object({
   JWT_ACCESS_SECRET: z.string().min(32, 'Must be >= 32 chars'),
   JWT_REFRESH_SECRET: z.string().min(32, 'Must be >= 32 chars'),
 
+  // JWT tokens lifetime
+  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+
   // Frontend URL
   FRONTEND_URL: z.string().url('Must be a valid URL'),
 });

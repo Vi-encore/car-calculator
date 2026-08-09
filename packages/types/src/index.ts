@@ -1,12 +1,12 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // ─── User ──────────────────────────────────────────────────────────────
 
 export const UserSchema = z.object({
   id: z.string(),
   email: z.string().email(),
-  name: z.string().optional(),
-  avatar: z.string().url().optional(),
+  name: z.string().nullable().optional(),
+  avatar: z.string().url().nullable().optional(),
 });
 
 export type User = z.infer<typeof UserSchema>;
@@ -15,17 +15,17 @@ export type User = z.infer<typeof UserSchema>;
 
 /** DTO for Login — валідується на фронті (react-hook-form) і на беку (class-validator) */
 export const LoginDtoSchema = z.object({
-  email: z.string().email('Некоректний email'),
-  password: z.string().min(8, 'Мінімум 8 символів'),
+  email: z.string().email("Некоректний email"),
+  password: z.string().min(8, "Мінімум 8 символів"),
 });
 
 export type LoginDto = z.infer<typeof LoginDtoSchema>;
 
 /** DTO fro Registration */
 export const RegisterDtoSchema = z.object({
-  email: z.string().email('Некоректний email'),
-  password: z.string().min(8, 'Мінімум 8 символів'),
-  name: z.string().min(2, 'Мінімум 2 символи').optional(),
+  email: z.string().email("Некоректний email"),
+  password: z.string().min(8, "Мінімум 8 символів"),
+  name: z.string().min(2, "Мінімум 2 символи").optional(),
 });
 
 export type RegisterDto = z.infer<typeof RegisterDtoSchema>;
@@ -49,16 +49,18 @@ export type RefreshResponse = z.infer<typeof RefreshResponseSchema>;
 // ─── Calculation ──────────────────────────────────────────────────────────────
 
 /** DTO for CreateCalculation — валідується скрізь однаково */
-export const CreateCalculationDtoSchema = z.object({
-  brand: z.string().min(1, "Вкажіть марку"),
-  model: z.string().min(1, "Вкажіть модель"),
-  region: z.string().min(1, "Вкажіть регіон"),
-  yearFrom: z.number().int().min(1990).max(new Date().getFullYear()),
-  yearTo: z.number().int().min(1990).max(new Date().getFullYear()),
-}).refine(d => d.yearFrom <= d.yearTo, {
-  message: 'yearFrom не може бути більше yearTo',
-  path: ['yearFrom'],
-});
+export const CreateCalculationDtoSchema = z
+  .object({
+    brand: z.string().min(1, "Вкажіть марку"),
+    model: z.string().min(1, "Вкажіть модель"),
+    region: z.string().min(1, "Вкажіть регіон"),
+    yearFrom: z.number().int().min(1990).max(new Date().getFullYear()),
+    yearTo: z.number().int().min(1990).max(new Date().getFullYear()),
+  })
+  .refine((d) => d.yearFrom <= d.yearTo, {
+    message: "yearFrom не може бути більше yearTo",
+    path: ["yearFrom"],
+  });
 
 export type CreateCalculationDto = z.infer<typeof CreateCalculationDtoSchema>;
 
@@ -72,7 +74,7 @@ export const CalculationSchema = z.object({
   yearFrom: z.number().int(),
   yearTo: z.number().int(),
   avgPrice: z.number(),
-  currency: z.string().default('USD'),
+  currency: z.string().default("USD"),
   createdAt: z.string(),
 });
 
