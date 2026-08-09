@@ -110,4 +110,18 @@ export class AuthService {
 
     return { success: true };
   }
+
+  async logoutAll(refreshToken: string) {
+    const tokenRecord = await this.prismaService.refreshToken.findUnique({
+      where: { jti: refreshToken },
+    });
+
+    if (tokenRecord) {
+      await this.prismaService.refreshToken.deleteMany({
+        where: { userId: tokenRecord.userId },
+      });
+    }
+
+    return { success: true };
+  }
 }

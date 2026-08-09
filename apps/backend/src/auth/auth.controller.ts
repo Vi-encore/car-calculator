@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dtos/auth.dto';
-import { Throttle } from '@nestjs/throttler';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import {
   COOKIES_AGE,
-  GLOBAL_THROTTLER_LIMIT,
+  GLOBAL_THROTTLER_TTL_MS,
   LOGIN_THROTTLE_LIMIT,
 } from '../constants/constants';
 import type { Request, Response } from 'express';
@@ -43,7 +43,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @Throttle({
-    default: { limit: LOGIN_THROTTLE_LIMIT, ttl: GLOBAL_THROTTLER_LIMIT },
+    default: { limit: LOGIN_THROTTLE_LIMIT, ttl: GLOBAL_THROTTLER_TTL_MS },
   })
   async login(
     @Body() dto: LoginDto,
@@ -63,6 +63,7 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @SkipThrottle()
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -93,5 +94,21 @@ export class AuthController {
     }
     res.clearCookie('refreshToken');
     return { message: 'Logged out successfully' };
+  }
+
+  @Post('logout-all')
+  @HttpCode(HttpStatus.OK)
+  async logoutAll(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies['refreshToken'] as string;
+
+    if (refreshToken) {
+      await this.authService.logoutAll(refreshToken);
+    }
+
+    res.clearCookie('refreshToken');
+    return { message: 'Logged out from all devices successfully' };
   }
 }
