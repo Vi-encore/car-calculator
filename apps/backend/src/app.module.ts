@@ -7,6 +7,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import {
+  GLOBAL_THROTTLER_LIMIT,
+  GLOBAL_THROTTLER_TTL_MS,
+} from './constants/constants';
 
 @Module({
   imports: [
@@ -21,11 +27,23 @@ import { UsersModule } from './users/users.module';
         }),
       },
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: GLOBAL_THROTTLER_TTL_MS,
+        limit: GLOBAL_THROTTLER_LIMIT,
+      },
+    ]),
     PrismaModule,
     AuthModule,
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
