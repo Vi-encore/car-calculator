@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CalculationsService } from './calculations.service';
 import { CreateCalculationDto } from './dtos/calculations.dto';
@@ -24,9 +24,13 @@ export class CalculationsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('history')
-  async getHistory(@CurrentUser() user: User) {
+  async getHistory(
+    @CurrentUser() user: User,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
     const userId = user.id;
 
-    return this.calculationsService.getHistory(userId);
+    return this.calculationsService.getHistory(userId, page, limit);
   }
 }

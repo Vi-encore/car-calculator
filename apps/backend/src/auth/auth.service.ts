@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   RegisterDto,
   LoginDto,
@@ -87,15 +88,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
+    // Delete old token (token rotation)
     await this.prismaService.refreshToken.delete({
       where: { jti: oldRefreshToken },
     });
 
-    const accessToken = this.generateAccessToken(
-      tokenRecord.user.id,
-      tokenRecord.user.email,
-    );
-    const refreshToken = await this.generateRefreshToken(tokenRecord.user.id);
+    const safeUser = UserSchema.parse(tokenRecord.user);
+    const accessToken = this.generateAccessToken(safeUser.id, safeUser.email);
+    const refreshToken = await this.generateRefreshToken(safeUser.id);
     return { accessToken, refreshToken };
   }
 
@@ -123,5 +123,18 @@ export class AuthService {
     }
 
     return { success: true };
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async clearExpiredTokens() {
+    console.log('Cron Job: Cleaning up expired refresh tokens...');
+    try {
+      const result = await this.prismaService.refreshToken.deleteMany({
+        where: { expiresAt: { lt: new Date() } },
+      });
+      console.log(`Cron Job: Deleted ${result.count} expired tokens.`);
+    } catch (e) {
+      console.error('Cron Job Failed:', e);
+    }
   }
 }

@@ -62,10 +62,38 @@ export class CalculationsService {
     return savedCalc;
   }
 
-  async getHistory(userId: string) {
-    return this.prismaService.calculation.findMany({
+  async getHistory(userId: string, pageStr?: string, limitStr?: string) {
+    const MAX_LIMIT = 100;
+    const DEFAULT_LIMIT = 10;
+
+    const rawLimit = Number.parseInt(limitStr ?? '', 10);
+    const rawPage = Number.parseInt(pageStr ?? '', 10);
+
+    // Clamp: default 10, min 1, max 100
+    const limit = Number.isFinite(rawLimit)
+      ? Math.min(Math.max(rawLimit, 1), MAX_LIMIT)
+      : DEFAULT_LIMIT;
+    // Clamp: default 1, min 1
+    const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+    const skip = (page - 1) * limit;
+
+    const data = await this.prismaService.calculation.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
     });
+
+    const total = await this.prismaService.calculation.count({
+      where: { userId },
+    });
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }

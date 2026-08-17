@@ -15,6 +15,7 @@ import {
 } from './constants/constants';
 import { PricesModule } from './prices/prices.module';
 import { CalculationsModule } from './calculations/calculations.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { CalculationsModule } from './calculations/calculations.module';
     UsersModule,
     PricesModule,
     CalculationsModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [
