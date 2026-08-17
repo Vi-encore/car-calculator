@@ -6,6 +6,8 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { CACHE_LIFE_TIME } from '../constants/constants';
 
 @Module({
   imports: [
@@ -16,6 +18,10 @@ import { PrismaModule } from '../prisma/prisma.module';
       useFactory: () => ({
         secret: process.env.JWT_ACCESS_SECRET,
       }),
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: CACHE_LIFE_TIME,
     }),
   ],
   providers: [AuthService, JwtStrategy],

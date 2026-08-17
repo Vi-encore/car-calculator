@@ -96,4 +96,20 @@ export class CalculationsService {
       totalPages: Math.ceil(total / limit),
     };
   }
+
+  async getPublicRecent() {
+    return this.prismaService.calculation.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        brand: true,
+        model: true,
+        year: true,
+        avgPrice: true,
+        photoUrl: true,
+        createdAt: true,
+      },
+    });
+  }
 }
