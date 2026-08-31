@@ -3,7 +3,10 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "docker compose -f apps/backend/docker-compose.yml up -d && turbo run dev",
+    "db:up": "docker compose -f apps/backend/docker-compose.yml up -d",
+    "db:down": "docker compose -f apps/backend/docker-compose.yml down",
+    "db:studio": "npm run --workspace=apps/backend db:check",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

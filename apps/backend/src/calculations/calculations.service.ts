@@ -105,7 +105,7 @@ export class CalculationsService {
         id: true,
         brand: true,
         model: true,
-        year: true,
+        // year: true,
         avgPrice: true,
         photoUrl: true,
         createdAt: true,
