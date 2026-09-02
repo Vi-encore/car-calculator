@@ -14,27 +14,30 @@ import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { routes } from "./constants/constantRoute";
 import { NotFoundPage } from "./pages/NotFoundPage/NotFoundPage";
+import { Layout } from "./components/Layout/Layout";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 🌍 Public route */}
-        <Route path={routes.default} element={<LandingPage />} />
-        {/* 🚪 Guest routes (login/register) */}
-        <Route element={<PublicOnlyRoute />}>
-          <Route path={routes.login} element={<LoginPage />} />
-          <Route path={routes.register} element={<RegisterPage />} />
+        <Route element={<Layout />}>
+          {/* 🌍 Public route */}
+          <Route path={routes.default} element={<LandingPage />} />
+          {/* 🚪 Guest routes (login/register) */}
+          <Route element={<PublicOnlyRoute />}>
+            <Route path={routes.login} element={<LoginPage />} />
+            <Route path={routes.register} element={<RegisterPage />} />
+          </Route>
+          {/* 🔒Protected routes (Calculator / History / Profile) */}
+          <Route element={<ProtectedRoute />}>
+            <Route path={routes.calculator} element={<CalculatorPage />} />
+            <Route path={routes.history} element={<HistoryPage />} />
+            <Route path={routes.profile} element={<ProfilePage />} />
+          </Route>
+          {/* 404 — URL is different from known urls */}
+          {/* <Route path="*" element={<Navigate to={routes.default} replace />} /> */}
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
-        {/* 🔒Protected routes (Calculator / History / Profile) */}
-        <Route element={<ProtectedRoute />}>
-          <Route path={routes.register} element={<CalculatorPage />} />
-          <Route path={routes.history} element={<HistoryPage />} />
-          <Route path={routes.profile} element={<ProfilePage />} />
-        </Route>
-        {/* 404 — URL is different from known urls */}
-        {/* <Route path="*" element={<Navigate to={routes.default} replace />} /> */}
-        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
