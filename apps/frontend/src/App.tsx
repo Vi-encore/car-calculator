@@ -1,23 +1,42 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "./assets/vite.svg";
-import heroImg from "./assets/hero.png";
+// import { useState } from "react";
+// import reactLogo from "./assets/react.svg";
+// import viteLogo from "./assets/vite.svg";
+// import heroImg from "./assets/hero.png";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
+import { PublicOnlyRoute } from "./components/PublicOnlyRoute/PublicOnlyRoute";
+import { LoginPage } from "./pages/LoginPage/LoginPage";
+import { LandingPage } from "./pages/LandingPage/LandingPage";
+import { RegisterPage } from "./pages/RegisterPage/RegisterPage";
+import { CalculatorPage } from "./pages/CalculatorPage/CalculatorPage";
+import { HistoryPage } from "./pages/HistoryPage/HistoryPage";
+import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
+import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
+import { routes } from "./constants/constantRoute";
+import { NotFoundPage } from "./pages/NotFoundPage/NotFoundPage";
 
 export default function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50">
-      <div className="rounded-2xl bg-white p-8 shadow-xl text-center border border-slate-100">
-        <h1 className="text-3xl font-bold text-slate-800">🚗 Car Calculator</h1>
-        <p className="mt-2 text-slate-500">Tailwind CSS успішно підключено!</p>
-        <button
-          type="button"
-          className="mt-4 rounded-xl bg-gradient-to-r from-teal-400 to-cyan-500 px-6 py-2.5 font-semibold text-white shadow-md shadow-teal-500/20 hover:opacity-95 transition"
-        >
-          Тестова кнопка
-        </button>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* 🌍 Public route */}
+        <Route path={routes.default} element={<LandingPage />} />
+        {/* 🚪 Guest routes (login/register) */}
+        <Route element={<PublicOnlyRoute />}>
+          <Route path={routes.login} element={<LoginPage />} />
+          <Route path={routes.register} element={<RegisterPage />} />
+        </Route>
+        {/* 🔒Protected routes (Calculator / History / Profile) */}
+        <Route element={<ProtectedRoute />}>
+          <Route path={routes.register} element={<CalculatorPage />} />
+          <Route path={routes.history} element={<HistoryPage />} />
+          <Route path={routes.profile} element={<ProfilePage />} />
+        </Route>
+        {/* 404 — URL is different from known urls */}
+        {/* <Route path="*" element={<Navigate to={routes.default} replace />} /> */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
