@@ -19,7 +19,7 @@ export function RegisterPage() {
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <Input
-          label="Ім'я (необов'язково)"
+          label="Ваше ім'я"
           type="text"
           placeholder="Олександр"
           error={errors.name?.message}

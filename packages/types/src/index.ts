@@ -41,7 +41,7 @@ export type LoginDto = z.infer<typeof LoginDtoSchema>;
 export const RegisterDtoSchema = z.object({
   email: z.string().email("Некоректний email"),
   password: z.string().min(8, "Мінімум 8 символів"),
-  name: z.string().min(2, "Мінімум 2 символи").optional(),
+  name: z.string().min(2, "Введіть ваше ім'я (мінімум 2 символи)"),
 });
 
 export type RegisterDto = z.infer<typeof RegisterDtoSchema>;
