@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { Loader } from "../Loader/Loader";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   readonly variant?: "primary" | "outline" | "ghost" | "danger";
@@ -41,7 +42,16 @@ export function Button({
       className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
       {...props}
     >
-      {isLoading ? "Завантаження..." : children}
+      {isLoading ? (
+        <span className="flex items-center gap-2">
+          <Loader size="sm" className="border-white border-t-transparent" />
+          <span>Зачекайте...</span>
+        </span>
+      ) : (
+        children
+      )}
     </button>
   );
 }
+
+Button.displayName = "Button";
