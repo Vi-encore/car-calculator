@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { PricesService } from './prices.service';
 import { MockPricesService } from './mock-prices.service';
+import { IPricesService } from './prices.interface';
 
 @Module({
-  providers: [PricesService, MockPricesService],
-  exports: [PricesService, MockPricesService],
+  providers: [{ provide: IPricesService, useClass: MockPricesService }],
+  exports: [IPricesService],
 })
 export class PricesModule {}

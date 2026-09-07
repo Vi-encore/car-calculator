@@ -1,3 +1,2 @@
-// Barrel re-export — DTOs moved to individual files
 export * from './login.dto';
 export * from './register.dto';

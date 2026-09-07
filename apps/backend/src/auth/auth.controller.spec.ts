@@ -60,7 +60,7 @@ describe('AuthController', () => {
         user: { id: '1' },
       });
 
-      const result = await controller.register({ email: 'a@a.com', password: '123' }, res);
+      const result = await controller.register({ email: 'a@a.com', password: '12345678', name: 'Test' }, res);
 
       expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'refresh', expect.any(Object));
       expect(result).toEqual({ accessToken: 'access', user: { id: '1' } });

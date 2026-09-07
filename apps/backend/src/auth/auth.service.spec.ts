@@ -186,11 +186,11 @@ describe('AuthService', () => {
     });
   });
 
-  describe('logoutAll', () => {
+  describe('logoutAllUserSessions', () => {
     it('should delete all user tokens if current token is found', async () => {
       prismaService.refreshToken.findUnique.mockResolvedValueOnce({ userId: 'user-123' });
       
-      await service.logoutAll('some_token');
+      await service.logoutAllUserSessions('some_token');
       
       expect(prismaService.refreshToken.deleteMany).toHaveBeenCalledWith({ where: { userId: 'user-123' } });
     });

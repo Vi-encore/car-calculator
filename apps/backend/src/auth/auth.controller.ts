@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dtos/auth.dto';
+import { LoginDto, RegisterDto } from './dtos';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import {
   COOKIES_AGE,
@@ -117,7 +117,7 @@ export class AuthController {
     const refreshToken = req.cookies['refreshToken'] as string;
 
     if (refreshToken) {
-      await this.authService.logoutAll(refreshToken);
+      await this.authService.logoutAllUserSessions(refreshToken);
     }
 
     res.clearCookie('refreshToken');

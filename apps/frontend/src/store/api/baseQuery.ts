@@ -27,23 +27,27 @@ export const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   let result = await rawBaseQuery(args, api, extraOptions);
-  if (result.error?.status === 401) {
-    const isRefreshRequest =
-      typeof args === "object" && args.url === "/auth/refresh";
-    if (!isRefreshRequest) {
-      const refreshResult = await rawBaseQuery(
-        { url: "/auth/refresh", method: "POST" },
-        api,
-        extraOptions,
-      );
-      if (refreshResult.data) {
-        const data = refreshResult.data as { accessToken: string };
-        api.dispatch(setCredentials({ accessToken: data.accessToken }));
-        result = await rawBaseQuery(args, api, extraOptions);
-      } else {
-        api.dispatch(logout());
-      }
-    }
+
+  if (result.error?.status !== 401) return result;
+
+  const isRefreshRequest =
+    typeof args === "object" && args.url === "/auth/refresh";
+  if (isRefreshRequest) return result;
+
+  const refreshResult = await rawBaseQuery(
+    { url: "/auth/refresh", method: "POST" },
+    api,
+    extraOptions,
+  );
+
+  if (!refreshResult.data) {
+    api.dispatch(logout());
+    return result;
   }
+
+  const data = refreshResult.data as { accessToken: string };
+  api.dispatch(setCredentials({ accessToken: data.accessToken }));
+  result = await rawBaseQuery(args, api, extraOptions);
+
   return result;
 };

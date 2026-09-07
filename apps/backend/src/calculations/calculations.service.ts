@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { MockPricesService } from '../prices/mock-prices.service';
+import { IPricesService } from '../prices/prices.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCalculationDto, PriceItem } from '@car-calculator/types';
 
 @Injectable()
 export class CalculationsService {
   constructor(
-    private readonly pricesService: MockPricesService,
+    private readonly pricesService: IPricesService,
     private readonly prismaService: PrismaService,
   ) {}
 

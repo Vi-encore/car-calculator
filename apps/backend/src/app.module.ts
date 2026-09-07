@@ -16,6 +16,7 @@ import {
 import { PricesModule } from './prices/prices.module';
 import { CalculationsModule } from './calculations/calculations.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CleanupModule } from './cleanup/cleanup.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     PricesModule,
     CalculationsModule,
     ScheduleModule.forRoot(),
+    CleanupModule,
   ],
   controllers: [AppController],
   providers: [

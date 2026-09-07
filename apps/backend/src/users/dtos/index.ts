@@ -1,3 +1,2 @@
-// Barrel re-export — DTOs moved to individual files
 export * from './update-profile.dto';
 export * from './update-password.dto';

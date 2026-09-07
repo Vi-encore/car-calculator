@@ -1,8 +1,9 @@
 import { CreateCalculationDto, PriceItem } from '@car-calculator/types';
 import { Injectable, Logger } from '@nestjs/common';
+import { IPricesService } from './prices.interface';
 
 @Injectable()
-export class MockPricesService {
+export class MockPricesService extends IPricesService {
   private readonly logger = new Logger(MockPricesService.name);
 
   private readonly mockPhotos = [

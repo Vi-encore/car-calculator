@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto, UserSchema } from '@car-calculator/types';
-import { UpdatePasswordDto, UpdateProfileDto } from './dtos/users.dto';
+import { UpdatePasswordDto, UpdateProfileDto } from './dtos';
 // bcrypt types did not get recognized by eslint
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const bcrypt = require('bcrypt') as typeof import('bcrypt');

@@ -32,7 +32,7 @@ export type UpdatePasswordDto = z.infer<typeof UpdatePasswordDtoSchema>;
 /** DTO for Login — валідується на фронті (react-hook-form) і на беку (class-validator) */
 export const LoginDtoSchema = z.object({
   email: z.string().email("Некоректний email"),
-  password: z.string().min(8, "Мінімум 8 символів"),
+  password: z.string().min(1, "Введіть пароль"),
 });
 
 export type LoginDto = z.infer<typeof LoginDtoSchema>;
