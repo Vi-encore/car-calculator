@@ -1,7 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { IPricesService } from '../prices/prices.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCalculationDto, PriceItem } from '@car-calculator/types';
+
+const CAR_LISTINGS_LIMIT = 10;
 
 @Injectable()
 export class CalculationsService {
@@ -22,6 +28,12 @@ export class CalculationsService {
     return cars.filter(
       (car) => car.price >= lowerBound && car.price <= upperBound,
     );
+  }
+
+  private selectClosestToAvg(cars: PriceItem[], avgPrice: number): PriceItem[] {
+    return [...cars]
+      .sort((a, b) => Math.abs(a.price - avgPrice) - Math.abs(b.price - avgPrice))
+      .slice(0, CAR_LISTINGS_LIMIT);
   }
 
   async calculateAvgPrice(dto: CreateCalculationDto, userId: string) {
@@ -49,17 +61,47 @@ export class CalculationsService {
       );
     }
 
-    const savedCalc = await this.prismaService.calculation.create({
-      data: {
-        ...dto,
-        avgPrice,
-        photoUrl,
-        avgMileage,
-        userId,
-      },
+    const top10 = this.selectClosestToAvg(normalizedCars, avgPrice);
+
+    const savedCalc = await this.prismaService.$transaction(async (tx) => {
+      const calc = await tx.calculation.create({
+        data: {
+          ...dto,
+          avgPrice,
+          photoUrl,
+          avgMileage,
+          userId,
+        },
+      });
+
+      await tx.carListing.createMany({
+        data: top10.map((car) => ({
+          calculationId: calc.id,
+          price: car.price,
+          year: car.year,
+          mileage: car.mileage ?? null,
+          source: car.source ?? null,
+          photoUrl: car.photoUrl ?? null,
+        })),
+      });
+
+      return calc;
     });
 
     return savedCalc;
+  }
+
+  async getById(id: string, userId: string) {
+    const calc = await this.prismaService.calculation.findFirst({
+      where: { id, userId },
+      include: {
+        carListings: { orderBy: { price: 'asc' } },
+      },
+    });
+
+    if (!calc) throw new NotFoundException('Calculation not found');
+
+    return calc;
   }
 
   async getHistory(userId: string, pageStr?: string, limitStr?: string) {

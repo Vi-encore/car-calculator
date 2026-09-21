@@ -4,6 +4,7 @@ import { RegisterDtoSchema, type RegisterDto } from "@car-calculator/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { routes } from "../../../constants/constantRoute";
+import { extractServerError } from "../../../utils/extractServerError";
 
 export function useRegisterForm() {
   const navigate = useNavigate();
@@ -27,11 +28,7 @@ export function useRegisterForm() {
   };
 
   // Повідомлення від бекенду (наприклад: "User is already registered")
-  const serverError =
-    error && "data" in error
-      ? (error.data as { message?: string })?.message ||
-        "Помилка при реєстрації"
-      : null;
+  const serverError = extractServerError(error, "Помилка при реєстрації");
 
   return {
     register,

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
   UseGuards,
@@ -32,20 +33,21 @@ export class CalculationsController {
     @Body() dto: CreateCalculationDto,
     @CurrentUser() user: User,
   ) {
-    const userId = user.id;
-
-    return this.calculationsService.calculateAvgPrice(dto, userId);
+    return this.calculationsService.calculateAvgPrice(dto, user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('history')
   async getHistory(
     @CurrentUser() user: User,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    const userId = user.id;
+    return this.calculationsService.getHistory(user.id, page, limit);
+  }
 
-    return this.calculationsService.getHistory(userId, page, limit);
+  // ⚠️ :id має бути ПІСЛЯ статичних маршрутів (history, public-recent)
+  @Get(':id')
+  async getById(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.calculationsService.getById(id, user.id);
   }
 }

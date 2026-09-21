@@ -53,9 +53,24 @@ model Calculation {
   mileageTo Int?
 
   // links
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  carListings CarListing[]
 
   @@map("calculations")
+}
+
+model CarListing {
+  id            String      @id @default(uuid())
+  calculationId String
+  price         Float
+  year          Int
+  mileage       Int?
+  source        String?
+  photoUrl      String?
+
+  calculation Calculation @relation(fields: [calculationId], references: [id], onDelete: Cascade)
+
+  @@map("car_listings")
 }
 
 model RefreshToken {

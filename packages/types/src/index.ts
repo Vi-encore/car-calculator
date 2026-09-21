@@ -128,3 +128,23 @@ export const PriceItemSchema = z.object({
 });
 
 export type PriceItem = z.infer<typeof PriceItemSchema>;
+
+// ─── CarListing ────────────────────────────────────────────────────────────────
+
+export const CarListingSchema = z.object({
+  id: z.string(),
+  calculationId: z.string(),
+  price: z.number(),
+  year: z.number().int(),
+  mileage: z.number().int().nullable().optional(),
+  source: z.string().nullable().optional(),
+  photoUrl: z.string().nullable().optional(),
+});
+
+export type CarListing = z.infer<typeof CarListingSchema>;
+
+export type CalculationWithListings = Calculation & {
+  carListings: CarListing[];
+};
+
+// TODO types to diff models

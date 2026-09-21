@@ -17,9 +17,18 @@ export function NavAuth() {
     <div className="flex items-center gap-3">
       {isAuthenticated ? (
         <>
-          <span className="text-sm text-slate-700 font-medium">
-            👋 {user?.name || user?.email}
-          </span>
+          <div className="flex items-center gap-2">
+            {user?.avatar && (
+              <img
+                src={user.avatar}
+                alt={user.name || "Аватар"}
+                className="h-8 w-8 rounded-full object-cover shadow-sm border border-slate-200"
+              />
+            )}
+            <span className="text-sm text-slate-700 font-medium">
+              👋 {user?.name || user?.email}
+            </span>
+          </div>
           <Button
             variant="ghost"
             size="sm"

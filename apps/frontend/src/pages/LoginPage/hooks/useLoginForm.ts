@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { LoginDtoSchema, type LoginDto } from "@car-calculator/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { routes } from "../../../constants/constantRoute";
+import { extractServerError } from "../../../utils/extractServerError";
 
 export function useLoginForm() {
   const navigate = useNavigate();
@@ -26,11 +27,7 @@ export function useLoginForm() {
     }
   }
 
-  const serverError =
-    error && "data" in error
-      ? (error.data as { message?: string })?.message ||
-        "Невірний email або пароль"
-      : null;
+  const serverError = extractServerError(error, "Невірний email або пароль");
 
   return {
     register,

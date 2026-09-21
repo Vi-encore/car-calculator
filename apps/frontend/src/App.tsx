@@ -3,7 +3,6 @@
 // import viteLogo from "./assets/vite.svg";
 // import heroImg from "./assets/hero.png";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import "./App.css";
 import { PublicOnlyRoute } from "./components/PublicOnlyRoute/PublicOnlyRoute";
 import { LoginPage } from "./pages/LoginPage/LoginPage";
 import { LandingPage } from "./pages/LandingPage/LandingPage";
@@ -15,6 +14,7 @@ import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { routes } from "./constants/constantRoute";
 import { NotFoundPage } from "./pages/NotFoundPage/NotFoundPage";
 import { Layout } from "./components/Layout/Layout";
+import { CalculationDetailPage } from "./pages/CalculationDetailPage/CalculationDetailPage";
 
 export default function App() {
   return (
@@ -32,6 +32,8 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path={routes.calculator} element={<CalculatorPage />} />
             <Route path={routes.history} element={<HistoryPage />} />
+            {/* //TODO use correct const here*/}
+            <Route path={`${routes.history}/:id`} element={<CalculationDetailPage />} />
             <Route path={routes.profile} element={<ProfilePage />} />
           </Route>
           {/* 404 — URL is different from known urls */}

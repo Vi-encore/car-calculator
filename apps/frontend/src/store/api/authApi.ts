@@ -6,6 +6,20 @@ import type {
 } from "@car-calculator/types";
 import { apiSlice } from "./apiSlice";
 import { logout, setCredentials } from "../slices/authSlice";
+import type { ThunkDispatch, UnknownAction } from "@reduxjs/toolkit";
+
+// Спільна логіка для login/register: зберегти токени після успішної авторизації
+async function onAuthSuccess(
+  dispatch: ThunkDispatch<unknown, unknown, UnknownAction>,
+  queryFulfilled: Promise<{ data: LoginResponse }>
+) {
+  try {
+    const { data } = await queryFulfilled;
+    dispatch(setCredentials(data));
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -16,12 +30,7 @@ export const authApi = apiSlice.injectEndpoints({
         body: credentials,
       }),
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setCredentials(data));
-        } catch (e) {
-          console.error(e);
-        }
+        await onAuthSuccess(dispatch, queryFulfilled);
       },
       invalidatesTags: ["User"],
     }),
@@ -32,12 +41,7 @@ export const authApi = apiSlice.injectEndpoints({
         body: credentials,
       }),
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setCredentials(data));
-        } catch (e) {
-          console.error(e);
-        }
+        await onAuthSuccess(dispatch, queryFulfilled);
       },
       invalidatesTags: ["User"],
     }),
