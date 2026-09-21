@@ -2,6 +2,7 @@ import type { UseFormRegister, FieldErrors, UseFormHandleSubmit } from "react-ho
 import type { BaseSyntheticEvent } from "react";
 import { Input } from "../../ui/Input/Input";
 import { Button } from "../../ui/Button/Button";
+import { AvatarUpload } from "../AvatarUpload/AvatarUpload";
 import type { ProfileFormValues } from "../../pages/ProfilePage/hooks/useProfileForm";
 
 interface ProfileFormProps {
@@ -26,6 +27,11 @@ export function ProfileForm({
       <h2 className="mb-4 text-lg font-semibold text-slate-800">
         Особисті дані
       </h2>
+
+      <div className="mb-6">
+        <AvatarUpload />
+      </div>
+
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <Input
           label="Ім'я"
@@ -33,13 +39,6 @@ export function ProfileForm({
           placeholder="Іван Іванов"
           error={errors.name?.message}
           {...register("name")}
-        />
-        <Input
-          label="URL аватарки (необов'язково)"
-          type="url"
-          placeholder="https://example.com/avatar.jpg"
-          error={errors.avatar?.message}
-          {...register("avatar")}
         />
 
         {serverError && (

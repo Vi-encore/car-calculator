@@ -9,7 +9,6 @@ import { extractServerError } from "../../../utils/extractServerError";
 
 const ProfileFormSchema = z.object({
   name: z.string().min(2, "Мінімум 2 символи").or(z.literal("")),
-  avatar: z.string().url("Некоректне посилання").or(z.literal("")),
 });
 
 export type ProfileFormValues = z.infer<typeof ProfileFormSchema>;
@@ -36,7 +35,6 @@ export function useProfileForm(): {
     mode: "onTouched",
     defaultValues: {
       name: user?.name ?? "",
-      avatar: user?.avatar ?? "",
     },
   });
 
@@ -44,7 +42,6 @@ export function useProfileForm(): {
     if (user) {
       resetForm({
         name: user.name ?? "",
-        avatar: user.avatar ?? "",
       });
     }
   }, [user, resetForm]);
@@ -58,7 +55,6 @@ export function useProfileForm(): {
   async function onSubmit(raw: ProfileFormValues) {
     const payload = {
       name: raw.name || undefined,
-      avatar: raw.avatar || undefined,
     };
 
     try {

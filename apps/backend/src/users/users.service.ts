@@ -1,5 +1,6 @@
 import {
   Injectable,
+  BadRequestException,
   ConflictException,
   UnauthorizedException,
   NotFoundException,
@@ -7,13 +8,17 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto, UserSchema } from '@car-calculator/types';
 import { UpdatePasswordDto, UpdateProfileDto } from './dtos';
+import { UploadService } from '../upload/upload.service';
 // bcrypt types did not get recognized by eslint
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const bcrypt = require('bcrypt') as typeof import('bcrypt');
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   private async hashPassword(password: string) {
     return await bcrypt.hash(password, 12);
@@ -110,6 +115,19 @@ export class UsersService {
       },
     });
     return { message: 'Password changed successfully' };
+  }
+
+  async updateAvatar(id: string, file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('No file uploaded');
+
+    const avatarUrl = await this.uploadService.uploadAvatar(file);
+
+    const updatedUser = await this.prismaService.user.update({
+      where: { id },
+      data: { avatar: avatarUrl },
+    });
+
+    return UserSchema.parse(updatedUser);
   }
 
   // resetPassword — планується у майбутніх версіях
