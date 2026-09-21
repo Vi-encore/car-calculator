@@ -1,4 +1,4 @@
-import { routes } from "../../constants/constantRoute";
+import { routes } from "../../constants/routes";
 import { Input } from "../../ui/Input/Input";
 import { Button } from "../../ui/Button/Button";
 import { useLoginForm } from "./hooks/useLoginForm";

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Форматування ціни у USD (uk-UA локаль)
  * @example formatUSD(15000) → "$15 000"
  */
@@ -15,7 +15,7 @@ export function formatUSD(price: number): string {
  * @example formatMileage(120000) → "120 000 км"
  */
 export function formatMileage(km: number): string {
-  return new Intl.NumberFormat("uk-UA").format(km) + " км";
+  return new Intl.NumberFormat("uk-UA").format(km) + " ��";
 }
 
 /**

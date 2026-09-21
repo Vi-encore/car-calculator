@@ -1,4 +1,3 @@
-// TODO: rename file routes.constants ot just routes (it is in a const folder)
 
 export const routes = {
   login: "/login",
@@ -6,6 +5,7 @@ export const routes = {
   calculator: "/calculator",
   history: "/history",
   historyDetail: (id: string) => `/history/${id}`,
+  historyDetailPattern: "/history/:id",
   profile: "/profile",
   default: "/",
 } as const;

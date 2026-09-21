@@ -6,7 +6,7 @@ import {
 } from "../../../../store/slices/authSlice";
 import { useLogoutMutation } from "../../../../store/api/authApi";
 import { Button } from "../../../../ui/Button/Button";
-import { routes } from "../../../../constants/constantRoute";
+import { routes } from "../../../../constants/routes";
 
 export function NavAuth() {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);

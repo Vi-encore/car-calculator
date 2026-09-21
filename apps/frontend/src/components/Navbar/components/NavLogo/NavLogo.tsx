@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { routes } from "../../../../constants/constantRoute";
+import { routes } from "../../../../constants/routes";
 import { useAppSelector } from "../../../../store/hooks";
 import { selectIsAuthenticated } from "../../../../store/slices/authSlice";
 

@@ -1,7 +1,7 @@
 import type { Calculation } from "@car-calculator/types";
 import { Link } from "react-router-dom";
 import { StatField } from "../../ui/StatField/StatField";
-import { routes } from "../../constants/constantRoute";
+import { routes } from "../../constants/routes";
 import { formatUSD, formatMileage, formatDateShort } from "../../utils/formatters";
 
 interface CalculationCardProps {
