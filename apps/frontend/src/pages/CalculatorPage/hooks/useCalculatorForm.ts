@@ -12,7 +12,7 @@ import { extractServerError } from "../../../utils/extractServerError";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-// Валідуємо рядки (бо HTML inputs повертають string), 
+// Валідуємо рядки (бо HTML inputs повертають string),
 // щоб типи input і output співпадали, і не було потреби в `as any`
 const CalculatorFormSchema = z
   .object({
@@ -24,14 +24,14 @@ const CalculatorFormSchema = z
       .min(1, "Вкажіть рік")
       .refine((v) => {
         const n = Number(v);
-        return !isNaN(n) && n >= 1990 && n <= CURRENT_YEAR;
+        return !Number.isNaN(n) && n >= 1990 && n <= CURRENT_YEAR;
       }, `Мін. 1990, макс. ${CURRENT_YEAR}`),
     yearTo: z
       .string()
       .min(1, "Вкажіть рік")
       .refine((v) => {
         const n = Number(v);
-        return !isNaN(n) && n >= 1990 && n <= CURRENT_YEAR;
+        return !Number.isNaN(n) && n >= 1990 && n <= CURRENT_YEAR;
       }, `Мін. 1990, макс. ${CURRENT_YEAR}`),
     mileageFrom: z.string().optional(),
     mileageTo: z.string().optional(),
@@ -50,7 +50,7 @@ const CalculatorFormSchema = z
     {
       message: "Пробіг «від» не може бути більше «до»",
       path: ["mileageFrom"],
-    }
+    },
   );
 
 export type CalculatorFormValues = z.infer<typeof CalculatorFormSchema>;
