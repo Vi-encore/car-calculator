@@ -8,7 +8,7 @@ const mockAuthService = {
   login: jest.fn(),
   refreshTokens: jest.fn(),
   logout: jest.fn(),
-  logoutAll: jest.fn(),
+  logoutAllUserSessions: jest.fn(),
 };
 
 // Хелпер для створення моку Response з потрібними методами
@@ -127,7 +127,9 @@ describe('AuthController', () => {
 
       await controller.logoutAll(req, res);
 
-      expect(mockAuthService.logoutAll).toHaveBeenCalledWith('some_token');
+      expect(mockAuthService.logoutAllUserSessions).toHaveBeenCalledWith(
+        'some_token',
+      );
       expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
     });
   });
