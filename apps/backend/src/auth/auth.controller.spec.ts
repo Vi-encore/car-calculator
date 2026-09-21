@@ -60,9 +60,16 @@ describe('AuthController', () => {
         user: { id: '1' },
       });
 
-      const result = await controller.register({ email: 'a@a.com', password: '12345678', name: 'Test' }, res);
+      const result = await controller.register(
+        { email: 'a@a.com', password: '12345678', name: 'Test' },
+        res,
+      );
 
-      expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'refresh', expect.any(Object));
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'refresh',
+        expect.any(Object),
+      );
       expect(result).toEqual({ accessToken: 'access', user: { id: '1' } });
     });
   });
@@ -76,9 +83,16 @@ describe('AuthController', () => {
         user: { id: '1' },
       });
 
-      const result = await controller.login({ email: 'a@a.com', password: '123' }, res);
+      const result = await controller.login(
+        { email: 'a@a.com', password: '123' },
+        res,
+      );
 
-      expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'refresh', expect.any(Object));
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'refresh',
+        expect.any(Object),
+      );
       expect(result).toEqual({ accessToken: 'access', user: { id: '1' } });
     });
   });
@@ -88,13 +102,15 @@ describe('AuthController', () => {
       const req = createMockRequest();
       const res = createMockResponse();
 
-      await expect(controller.refresh(req, res)).rejects.toThrow('No refresh token provided');
+      await expect(controller.refresh(req, res)).rejects.toThrow(
+        'No refresh token provided',
+      );
     });
 
     it('should set new cookie and return new access token', async () => {
       const req = createMockRequest({ refreshToken: 'old_refresh' });
       const res = createMockResponse();
-      
+
       mockAuthService.refreshTokens.mockResolvedValueOnce({
         accessToken: 'new_access',
         refreshToken: 'new_refresh',
@@ -103,7 +119,11 @@ describe('AuthController', () => {
       const result = await controller.refresh(req, res);
 
       expect(mockAuthService.refreshTokens).toHaveBeenCalledWith('old_refresh');
-      expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'new_refresh', expect.any(Object));
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'new_refresh',
+        expect.any(Object),
+      );
       expect(result).toEqual({ accessToken: 'new_access' });
     });
   });
