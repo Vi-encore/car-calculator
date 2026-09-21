@@ -67,8 +67,8 @@ export class AuthController {
     return response;
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  // No JwtAuthGuard: refresh authenticates via the httpOnly refreshToken
+  // cookie, not the (possibly expired) access token.
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @SkipThrottle()
