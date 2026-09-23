@@ -9,10 +9,19 @@ interface CarListingsTableProps {
 export function CarListingsTable({ listings, avgPrice }: CarListingsTableProps) {
   if (listings.length === 0) return null;
 
+  const hasLinks = listings.some(
+    (l) => l.source && /^https?:\/\//i.test(l.source),
+  );
+
   return (
     <div className="mt-6">
       <h2 className="mb-3 text-base font-semibold text-slate-700">
         Авто, що увійшли до розрахунку ({listings.length})
+        {hasLinks && (
+          <span className="ml-2 text-xs font-normal text-slate-400">
+            · натисніть на рядок, щоб відкрити оголошення
+          </span>
+        )}
       </h2>
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full">
