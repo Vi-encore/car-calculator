@@ -146,5 +146,3 @@ export type CarListing = z.infer<typeof CarListingSchema>;
 export type CalculationWithListings = Calculation & {
   carListings: CarListing[];
 };
-
-// TODO types to diff models

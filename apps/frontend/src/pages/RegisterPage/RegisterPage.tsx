@@ -1,6 +1,6 @@
 import { Input } from "../../ui/Input/Input";
 import { Button } from "../../ui/Button/Button";
-import { routes } from "../../constants/constantRoute";
+import { routes } from "../../constants/routes";
 import { useRegisterForm } from "./hooks/useRegisterForm";
 import { AuthCard } from "../../components/AuthCard/AuthCard";
 

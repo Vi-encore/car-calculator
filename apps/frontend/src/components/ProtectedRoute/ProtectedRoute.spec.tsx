@@ -3,7 +3,7 @@ import { screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { renderWithProviders } from "../../test/test-utils";
-import { routes } from "../../constants/constantRoute";
+import { routes } from "../../constants/routes";
 
 describe("ProtectedRoute", () => {
   it("redirects unauthenticated users to the login page", () => {

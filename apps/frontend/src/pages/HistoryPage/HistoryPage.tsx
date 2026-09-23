@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useHistory } from "./hooks/useHistory";
 import { CalculationCard } from "../../components/CalculationCard/CalculationCard";
 import { Button } from "../../ui/Button/Button";
-import { routes } from "../../constants/constantRoute";
+import { routes } from "../../constants/routes";
 import { Loader } from "../../ui/Loader/Loader";
 
 export function HistoryPage() {
