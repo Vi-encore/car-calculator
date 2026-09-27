@@ -4,6 +4,7 @@ import { PublicOnlyRoute } from "./components/PublicOnlyRoute/PublicOnlyRoute";
 import { LoginPage } from "./pages/LoginPage/LoginPage";
 import { LandingPage } from "./pages/LandingPage/LandingPage";
 import { RegisterPage } from "./pages/RegisterPage/RegisterPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage/ForgotPasswordPage";
 import { CalculatorPage } from "./pages/CalculatorPage/CalculatorPage";
 import { HistoryPage } from "./pages/HistoryPage/HistoryPage";
 import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
@@ -42,6 +43,10 @@ export default function App() {
           <Route element={<PublicOnlyRoute />}>
             <Route path={routes.login} element={<LoginPage />} />
             <Route path={routes.register} element={<RegisterPage />} />
+            <Route
+              path={routes.forgotPassword}
+              element={<ForgotPasswordPage />}
+            />
           </Route>
           {/* 🔁 Google OAuth повертається сюди (сесія — з refreshToken-cookie) */}
           <Route path={routes.authCallback} element={<AuthCallbackPage />} />

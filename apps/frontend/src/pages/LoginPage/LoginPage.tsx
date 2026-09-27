@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { routes } from "../../constants/routes";
 import { Input } from "../../ui/Input/Input";
 import { Button } from "../../ui/Button/Button";
@@ -33,6 +34,14 @@ export function LoginPage() {
           error={errors.password?.message}
           {...register("password")}
         />
+        <div className="-mt-2 text-right">
+          <Link
+            to={routes.forgotPassword}
+            className="text-xs font-medium text-teal-600 hover:underline"
+          >
+            Забули пароль?
+          </Link>
+        </div>
         <Button type="submit" isLoading={isLoading} className="w-full mt-2">
           Увійти
         </Button>

@@ -33,6 +33,17 @@ export const EnvSchema = z
     GOOGLE_CLIENT_SECRET: z.string().min(1),
     GOOGLE_CALLBACK_URL: z.string().url('Must be a valid URL'),
 
+    // Mail (Gmail SMTP — password-reset codes)
+    MAIL_HOST: z.string().min(1),
+    MAIL_PORT: z.coerce.number().int().default(465),
+    MAIL_USER: z.string().min(1),
+    MAIL_PASSWORD: z.string().min(1),
+    MAIL_FROM: z.string().min(1),
+
+    // Password reset
+    PASSWORD_RESET_CODE_TTL_MIN: z.coerce.number().int().min(1).default(10),
+    PASSWORD_RESET_MAX_ATTEMPTS: z.coerce.number().int().min(1).default(5),
+
     // Prices provider
     PRICES_PROVIDER: z.enum(['mock', 'autoria']).default('mock'),
     AUTO_RIA_API_KEY: z.string().min(1).optional(),

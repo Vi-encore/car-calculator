@@ -11,7 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dtos';
+import {
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+  VerifyResetCodeDto,
+} from './dtos';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -94,6 +100,41 @@ export class AuthController {
       maxAge: COOKIES_AGE,
     });
     return { accessToken };
+  }
+
+  // ─── Скидання пароля кодом ────────────────────────────────────────────────
+
+  @Post('password-reset/request')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({
+    default: { limit: LOGIN_THROTTLE_LIMIT, ttl: GLOBAL_THROTTLER_TTL_MS },
+  })
+  async requestPasswordReset(@Body() dto: ForgotPasswordDto) {
+    await this.authService.requestPasswordReset(dto.email);
+    // Однакова відповідь незалежно від існування акаунта (анти-енумерація).
+    return { message: 'Якщо акаунт існує, ми надіслали код на пошту' };
+  }
+
+  @Post('password-reset/verify')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({
+    default: { limit: LOGIN_THROTTLE_LIMIT, ttl: GLOBAL_THROTTLER_TTL_MS },
+  })
+  async verifyResetCode(@Body() dto: VerifyResetCodeDto) {
+    return this.authService.verifyResetCode(dto.email, dto.code);
+  }
+
+  @Post('password-reset/confirm')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({
+    default: { limit: LOGIN_THROTTLE_LIMIT, ttl: GLOBAL_THROTTLER_TTL_MS },
+  })
+  async confirmPasswordReset(@Body() dto: ResetPasswordDto) {
+    return this.authService.confirmPasswordReset(
+      dto.email,
+      dto.code,
+      dto.newPassword,
+    );
   }
 
   // Ініціює OAuth: passport редіректить на згоду Google (тіло не потрібне).

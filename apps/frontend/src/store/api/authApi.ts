@@ -1,8 +1,11 @@
 import type {
+  ForgotPasswordDto,
   LoginDto,
   LoginResponse,
   RegisterDto,
+  ResetPasswordDto,
   User,
+  VerifyResetCodeDto,
 } from "@car-calculator/types";
 import { apiSlice } from "./apiSlice";
 import { logout, setCredentials } from "../slices/authSlice";
@@ -62,6 +65,30 @@ export const authApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: ["User", "Calculation"],
     }),
+    requestPasswordReset: builder.mutation<
+      { message: string },
+      ForgotPasswordDto
+    >({
+      query: (body) => ({
+        url: "/auth/password-reset/request",
+        method: "POST",
+        body,
+      }),
+    }),
+    verifyResetCode: builder.mutation<{ valid: boolean }, VerifyResetCodeDto>({
+      query: (body) => ({
+        url: "/auth/password-reset/verify",
+        method: "POST",
+        body,
+      }),
+    }),
+    resetPassword: builder.mutation<{ message: string }, ResetPasswordDto>({
+      query: (body) => ({
+        url: "/auth/password-reset/confirm",
+        method: "POST",
+        body,
+      }),
+    }),
     getMe: builder.query<User, void>({
       query: () => "/users/me",
       providesTags: ["User"],
@@ -81,5 +108,8 @@ export const {
   useLoginMutation,
   useRegisterMutation,
   useLogoutMutation,
+  useRequestPasswordResetMutation,
+  useVerifyResetCodeMutation,
+  useResetPasswordMutation,
   useGetMeQuery,
 } = authApi;

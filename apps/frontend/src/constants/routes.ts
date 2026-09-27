@@ -2,6 +2,7 @@
 export const routes = {
   login: "/login",
   register: "/register",
+  forgotPassword: "/forgot-password",
   calculator: "/calculator",
   history: "/history",
   historyDetail: (id: string) => `/history/${id}`,

@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto, LoginDto } from '@car-calculator/types';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { IMailService } from '../mail/mail.interface';
 
 // Мокуємо bcrypt
 jest.mock('bcrypt');
@@ -29,6 +31,24 @@ const mockPrismaService = {
     delete: jest.fn(),
     deleteMany: jest.fn(),
   },
+  user: {
+    findUnique: jest.fn(),
+    update: jest.fn(),
+  },
+  passwordResetCode: {
+    create: jest.fn(),
+    findFirst: jest.fn(),
+    deleteMany: jest.fn(),
+    update: jest.fn(),
+  },
+};
+
+const mockConfigService = {
+  get: jest.fn(),
+};
+
+const mockMailService = {
+  sendPasswordResetCode: jest.fn(),
 };
 
 describe('AuthService', () => {
@@ -52,6 +72,14 @@ describe('AuthService', () => {
         {
           provide: PrismaService,
           useValue: mockPrismaService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+        {
+          provide: IMailService,
+          useValue: mockMailService,
         },
       ],
     }).compile();
@@ -246,6 +274,103 @@ describe('AuthService', () => {
 
       expect(prismaService.refreshToken.deleteMany).toHaveBeenCalledWith({
         where: { userId: 'user-123' },
+      });
+    });
+  });
+
+  describe('requestPasswordReset', () => {
+    it('creates a code and sends an email when the user exists', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValueOnce({
+        id: 'u1',
+        email: 'a@a.com',
+      });
+      mockConfigService.get.mockReturnValue(10);
+      (bcrypt.hash as jest.Mock).mockResolvedValueOnce('code_hash');
+      mockPrismaService.passwordResetCode.create.mockResolvedValueOnce({
+        id: 'c1',
+      });
+
+      await service.requestPasswordReset('a@a.com');
+
+      expect(
+        mockPrismaService.passwordResetCode.deleteMany,
+      ).toHaveBeenCalledWith({ where: { userId: 'u1', consumedAt: null } });
+      expect(mockPrismaService.passwordResetCode.create).toHaveBeenCalled();
+      expect(mockMailService.sendPasswordResetCode).toHaveBeenCalledWith(
+        'a@a.com',
+        expect.stringMatching(/^\d{6}$/),
+        10,
+      );
+    });
+
+    it('does nothing (no email) for an unknown address', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValueOnce(null);
+
+      await service.requestPasswordReset('nobody@a.com');
+
+      expect(mockPrismaService.passwordResetCode.create).not.toHaveBeenCalled();
+      expect(mockMailService.sendPasswordResetCode).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('confirmPasswordReset', () => {
+    const futureDate = () => new Date(Date.now() + 60_000);
+
+    it('sets the new password, consumes the code and revokes sessions', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValueOnce({
+        id: 'u1',
+        email: 'a@a.com',
+      });
+      mockPrismaService.passwordResetCode.findFirst.mockResolvedValueOnce({
+        id: 'c1',
+        codeHash: 'hash',
+        expiresAt: futureDate(),
+        attempts: 0,
+      });
+      mockConfigService.get.mockReturnValue(5);
+      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValueOnce('new_hash');
+
+      const result = await service.confirmPasswordReset(
+        'a@a.com',
+        '123456',
+        'newpass12',
+      );
+
+      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+        where: { id: 'u1' },
+        data: { passwordHash: 'new_hash' },
+      });
+      expect(mockPrismaService.passwordResetCode.update).toHaveBeenCalledWith({
+        where: { id: 'c1' },
+        data: { consumedAt: expect.any(Date) as Date },
+      });
+      expect(mockPrismaService.refreshToken.deleteMany).toHaveBeenCalledWith({
+        where: { userId: 'u1' },
+      });
+      expect(result).toEqual({ message: 'Пароль оновлено' });
+    });
+
+    it('throws on an invalid code and increments attempts', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValueOnce({
+        id: 'u1',
+        email: 'a@a.com',
+      });
+      mockPrismaService.passwordResetCode.findFirst.mockResolvedValueOnce({
+        id: 'c1',
+        codeHash: 'hash',
+        expiresAt: futureDate(),
+        attempts: 0,
+      });
+      mockConfigService.get.mockReturnValue(5);
+      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
+
+      await expect(
+        service.confirmPasswordReset('a@a.com', '000000', 'newpass12'),
+      ).rejects.toThrow(BadRequestException);
+      expect(mockPrismaService.passwordResetCode.update).toHaveBeenCalledWith({
+        where: { id: 'c1' },
+        data: { attempts: { increment: 1 } },
       });
     });
   });

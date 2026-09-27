@@ -62,6 +62,29 @@ export const RefreshResponseSchema = z.object({
 
 export type RefreshResponse = z.infer<typeof RefreshResponseSchema>;
 
+// ─── Скидання пароля ─────────────────────────────────────────────────────
+
+/** Крок 1: запит коду на email */
+export const ForgotPasswordDtoSchema = z.object({
+  email: z.string().email("Некоректний email"),
+});
+export type ForgotPasswordDto = z.infer<typeof ForgotPasswordDtoSchema>;
+
+/** Крок 2: перевірка коду (без «спалювання») */
+export const VerifyResetCodeDtoSchema = z.object({
+  email: z.string().email("Некоректний email"),
+  code: z.string().regex(/^\d{6}$/, "Код — 6 цифр"),
+});
+export type VerifyResetCodeDto = z.infer<typeof VerifyResetCodeDtoSchema>;
+
+/** Крок 3: підтвердження коду + новий пароль */
+export const ResetPasswordDtoSchema = z.object({
+  email: z.string().email("Некоректний email"),
+  code: z.string().regex(/^\d{6}$/, "Код — 6 цифр"),
+  newPassword: z.string().min(8, "Мінімум 8 символів"),
+});
+export type ResetPasswordDto = z.infer<typeof ResetPasswordDtoSchema>;
+
 // ─── Calculation ──────────────────────────────────────────────────────────────
 
 /** DTO for CreateCalculation — валідується скрізь однаково */
