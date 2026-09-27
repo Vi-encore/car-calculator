@@ -112,5 +112,5 @@ export class UsersService {
     return { message: 'Password changed successfully' };
   }
 
-  // TODO: reset password in future
+  // resetPassword — планується у майбутніх версіях
 }

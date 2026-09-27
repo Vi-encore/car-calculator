@@ -9,14 +9,31 @@ import { Button } from "../../ui/Button/Button";
 
 export function ProfilePage() {
   const user = useAppSelector(selectCurrentUser);
-  const profileForm = useProfileForm();
-  const passwordForm = usePasswordForm();
+
+  const {
+    register: profileRegister,
+    handleSubmit: profileHandleSubmit,
+    errors: profileErrors,
+    isLoading: profileIsLoading,
+    isSuccess: profileIsSuccess,
+    serverError: profileServerError,
+    onSubmit: profileOnSubmit,
+  } = useProfileForm();
+
+  const {
+    register: passwordRegister,
+    handleSubmit: passwordHandleSubmit,
+    errors: passwordErrors,
+    isLoading: passwordIsLoading,
+    isSuccess: passwordIsSuccess,
+    serverError: passwordServerError,
+    onSubmit: passwordOnSubmit,
+  } = usePasswordForm();
+
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
 
   if (!user) return null;
 
-  // TODO if/ try...catch? 
-  // TODO window.confirm to component (so modals)
   const handleDeleteAccount = async () => {
     if (
       window.confirm(
@@ -41,26 +58,24 @@ export function ProfilePage() {
       </div>
 
       <div className="flex flex-col gap-8">
-        {/* // TODO destruct */}
-        {/* TODO handleSubmit - change nmae to more basic general (createHandleSubmit etc) */}
         {/* Особисті дані */}
         <ProfileForm
-          register={profileForm.register}
-          onSubmit={profileForm.handleSubmit(profileForm.onSubmit)}
-          errors={profileForm.errors}
-          isLoading={profileForm.isLoading}
-          isSuccess={profileForm.isSuccess}
-          serverError={profileForm.serverError}
+          register={profileRegister}
+          onSubmit={profileHandleSubmit(profileOnSubmit)}
+          errors={profileErrors}
+          isLoading={profileIsLoading}
+          isSuccess={profileIsSuccess}
+          serverError={profileServerError}
         />
 
         {/* Зміна пароля */}
         <PasswordForm
-          register={passwordForm.register}
-          onSubmit={passwordForm.handleSubmit(passwordForm.onSubmit)}
-          errors={passwordForm.errors}
-          isLoading={passwordForm.isLoading}
-          isSuccess={passwordForm.isSuccess}
-          serverError={passwordForm.serverError}
+          register={passwordRegister}
+          onSubmit={passwordHandleSubmit(passwordOnSubmit)}
+          errors={passwordErrors}
+          isLoading={passwordIsLoading}
+          isSuccess={passwordIsSuccess}
+          serverError={passwordServerError}
         />
 
         {/* Небезпечна зона */}

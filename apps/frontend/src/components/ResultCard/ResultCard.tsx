@@ -1,6 +1,6 @@
 import type { Calculation } from "@car-calculator/types";
 import { Link } from "react-router-dom";
-import { routes } from "../../constants/constantRoute";
+import { routes } from "../../constants/routes";
 import { StatField } from "../../ui/StatField/StatField";
 import { formatUSD, formatMileage } from "../../utils/formatters";
 

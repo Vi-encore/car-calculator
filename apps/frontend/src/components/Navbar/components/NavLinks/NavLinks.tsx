@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useAppSelector } from "../../../../store/hooks";
 import { selectIsAuthenticated } from "../../../../store/slices/authSlice";
-import { routes } from "../../../../constants/constantRoute";
+import { routes } from "../../../../constants/routes";
 
 export function NavLinks() {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);

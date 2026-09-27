@@ -3,7 +3,7 @@ import { useRegisterMutation } from "../../../store/api/authApi";
 import { RegisterDtoSchema, type RegisterDto } from "@car-calculator/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { routes } from "../../../constants/constantRoute";
+import { routes } from "../../../constants/routes";
 import { extractServerError } from "../../../utils/extractServerError";
 
 export function useRegisterForm() {

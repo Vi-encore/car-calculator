@@ -1,5 +1,6 @@
 import { useForm, type UseFormRegister, type UseFormHandleSubmit, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { UpdatePasswordDtoSchema, type UpdatePasswordDto } from "@car-calculator/types";
 import { useUpdatePasswordMutation } from "../../../store/api/usersApi";
 import { extractServerError } from "../../../utils/extractServerError";
@@ -29,11 +30,17 @@ export function usePasswordForm(): {
     },
   });
 
+  // Автоматично ховаємо success-банер через 3 секунди
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timer = setTimeout(reset, 3000);
+    return () => clearTimeout(timer); // cleanup при unmount
+  }, [isSuccess, reset]);
+
   async function onSubmit(dto: UpdatePasswordDto) {
     try {
       await updatePassword(dto).unwrap();
       resetForm();
-      setTimeout(reset, 3000);
     } catch (e) {
       console.error(e);
     }

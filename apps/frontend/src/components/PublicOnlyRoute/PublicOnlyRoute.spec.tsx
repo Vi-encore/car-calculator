@@ -3,7 +3,7 @@ import { screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { PublicOnlyRoute } from "./PublicOnlyRoute";
 import { renderWithProviders } from "../../test/test-utils";
-import { routes } from "../../constants/constantRoute";
+import { routes } from "../../constants/routes";
 
 describe("PublicOnlyRoute", () => {
   it("renders the guest component when user is not authenticated", () => {

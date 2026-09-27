@@ -1,6 +1,6 @@
 import { useParams, Link, Navigate } from "react-router-dom";
 import { useGetCalculationByIdQuery } from "../../store/api/calculationsApi";
-import { routes } from "../../constants/constantRoute";
+import { routes } from "../../constants/routes";
 import { StatField } from "../../ui/StatField/StatField";
 import { Loader } from "../../ui/Loader/Loader";
 import { CarListingsTable } from "../../components/CarListingsTable/CarListingsTable";

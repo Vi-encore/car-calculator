@@ -48,6 +48,12 @@ export function useProfileForm(): {
       });
     }
   }, [user, resetForm]);
+  // Автоматично ховаємо success-банер через 3 секунди
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timer = setTimeout(reset, 3000);
+    return () => clearTimeout(timer); // cleanup при unmount
+  }, [isSuccess, reset]);
 
   async function onSubmit(raw: ProfileFormValues) {
     const payload = {
@@ -57,7 +63,6 @@ export function useProfileForm(): {
 
     try {
       await updateProfile(payload).unwrap();
-      setTimeout(reset, 3000);
     } catch (e) {
       console.error(e);
     }

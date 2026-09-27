@@ -1,4 +1,4 @@
-﻿import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import type { SerializedError } from "@reduxjs/toolkit";
 
 type RtkError = FetchBaseQueryError | SerializedError | undefined;
