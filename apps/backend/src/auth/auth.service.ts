@@ -9,6 +9,7 @@ import {
 import { UsersService } from '../users/users.service';
 import { randomBytes } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service';
+import { GoogleUser } from './strategies/google.strategy';
 
 // bcrypt types did not get recognized by eslint
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -75,6 +76,22 @@ export class AuthService {
 
     const safeUser = UserSchema.parse(user);
     return { accessToken, refreshToken, user: safeUser };
+  }
+
+  async googleLogin(
+    googleUser: GoogleUser,
+  ): Promise<LoginResponse & { refreshToken: string }> {
+    const user = await this.usersService.upsertOAuthUser({
+      email: googleUser.email,
+      providerId: googleUser.providerId,
+      name: googleUser.name,
+      avatar: googleUser.avatar,
+    });
+
+    const accessToken = this.generateAccessToken(user.id, user.email);
+    const refreshToken = await this.generateRefreshToken(user.id);
+
+    return { accessToken, refreshToken, user };
   }
 
   async refreshTokens(oldRefreshToken: string) {

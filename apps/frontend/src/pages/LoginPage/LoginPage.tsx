@@ -3,6 +3,7 @@ import { Input } from "../../ui/Input/Input";
 import { Button } from "../../ui/Button/Button";
 import { useLoginForm } from "./hooks/useLoginForm";
 import { AuthCard } from "../../components/AuthCard/AuthCard";
+import { GoogleButton } from "../../components/GoogleButton/GoogleButton";
 
 export function LoginPage() {
   const { register, handleSubmit, errors, isLoading, serverError, onSubmit } =
@@ -36,6 +37,8 @@ export function LoginPage() {
           Увійти
         </Button>
       </form>
+
+      <GoogleButton />
     </AuthCard>
   );
 }

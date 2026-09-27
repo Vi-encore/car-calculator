@@ -28,6 +28,11 @@ export const EnvSchema = z
     CLOUDINARY_API_KEY: z.string().min(1),
     CLOUDINARY_API_SECRET: z.string().min(1),
 
+    // Google OAuth2 (sign in with Google)
+    GOOGLE_CLIENT_ID: z.string().min(1),
+    GOOGLE_CLIENT_SECRET: z.string().min(1),
+    GOOGLE_CALLBACK_URL: z.string().url('Must be a valid URL'),
+
     // Prices provider
     PRICES_PROVIDER: z.enum(['mock', 'autoria']).default('mock'),
     AUTO_RIA_API_KEY: z.string().min(1).optional(),

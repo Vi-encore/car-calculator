@@ -6,6 +6,7 @@ import type { Request, Response } from 'express';
 const mockAuthService = {
   register: jest.fn(),
   login: jest.fn(),
+  googleLogin: jest.fn(),
   refreshTokens: jest.fn(),
   logout: jest.fn(),
   logoutAllUserSessions: jest.fn(),
@@ -16,6 +17,7 @@ const createMockResponse = () => {
   const res: Partial<Response> = {};
   res.cookie = jest.fn().mockReturnValue(res);
   res.clearCookie = jest.fn().mockReturnValue(res);
+  res.redirect = jest.fn().mockReturnValue(res);
   return res as Response;
 };
 
@@ -94,6 +96,33 @@ describe('AuthController', () => {
         expect.any(Object),
       );
       expect(result).toEqual({ accessToken: 'access', user: { id: '1' } });
+    });
+  });
+
+  describe('googleAuthCallback', () => {
+    it('should set cookie and redirect to the frontend callback', async () => {
+      const req = {
+        user: { providerId: 'g-1', email: 'g@test.com' },
+      } as unknown as Request;
+      const res = createMockResponse();
+
+      mockAuthService.googleLogin.mockResolvedValueOnce({
+        accessToken: 'access',
+        refreshToken: 'refresh',
+        user: { id: '1' },
+      });
+
+      await controller.googleAuthCallback(req, res);
+
+      expect(mockAuthService.googleLogin).toHaveBeenCalledWith(req.user);
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'refresh',
+        expect.any(Object),
+      );
+      expect(res.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('/auth/callback'),
+      );
     });
   });
 

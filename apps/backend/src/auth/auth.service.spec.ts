@@ -15,6 +15,7 @@ process.env.JWT_ACCESS_EXPIRES_IN = '15m';
 const mockUsersService = {
   create: jest.fn(),
   findByEmail: jest.fn(),
+  upsertOAuthUser: jest.fn(),
 };
 
 const mockJwtService = {
@@ -141,6 +142,37 @@ describe('AuthService', () => {
       expect(prismaService.refreshToken.create).toHaveBeenCalled();
       expect(result.accessToken).toEqual('access_token');
       expect(result.refreshToken).toEqual('fake_refresh_token');
+    });
+  });
+
+  describe('googleLogin', () => {
+    it('should upsert the OAuth user and return tokens', async () => {
+      const googleUser = {
+        providerId: 'g-1',
+        email: 'g@test.com',
+        name: 'G User',
+        avatar: 'http://img',
+      };
+      const upserted = { id: '9', email: 'g@test.com', name: 'G User' };
+      usersService.upsertOAuthUser.mockResolvedValueOnce(upserted);
+      jwtService.sign.mockReturnValueOnce('access_token');
+      prismaService.refreshToken.create.mockResolvedValueOnce({
+        jti: 'refresh_token',
+      });
+
+      const result = await service.googleLogin(googleUser);
+
+      expect(usersService.upsertOAuthUser).toHaveBeenCalledWith({
+        email: 'g@test.com',
+        providerId: 'g-1',
+        name: 'G User',
+        avatar: 'http://img',
+      });
+      expect(result).toEqual({
+        user: upserted,
+        accessToken: 'access_token',
+        refreshToken: 'refresh_token',
+      });
     });
   });
 

@@ -106,6 +106,18 @@ GOOGLE_CALLBACK_URL="http://localhost:3000/auth/google/callback"
 - Той самий email уже є як LOCAL → тихе лінкування (див. 3.2).
 - Скасування згоди на боці Google → callback з `error` → редірект на `/login`.
 
+### 3.6 Прод-нотатки (на деплой; коду не стосується)
+
+- URL-и — лише конфіг: у Google Console додати прод redirect URI +
+  JS origin (один клієнт може мати кілька; або окремий клієнт на prod). У env
+  задати прод `GOOGLE_CALLBACK_URL` і `FRONTEND_URL`.
+- Consent screen: скоупи не-чутливі (`email`, `profile`) → формальна
+  верифікація Google не потрібна, досить опублікувати consent screen.
+- **Cookie крос-домен:** якщо на проді фронт і бек будуть на РІЗНИХ доменах
+  (не піддоменах одного), `sameSite:'strict'` не пропустить refreshToken-cookie
+  крос-сайтом — тоді для всієї авторизації (login/refresh теж) знадобиться
+  `sameSite:'none'; secure:true`. На піддоменах одного домену — працює як є.
+
 ---
 
 ## 4. Фіча B — Скидання пароля кодом

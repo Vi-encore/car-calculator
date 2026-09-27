@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Provider } from '@prisma/client';
 import { RegisterDto, UserSchema } from '@car-calculator/types';
 import { UpdatePasswordDto, UpdateProfileDto } from './dtos';
 import { UploadService } from '../upload/upload.service';
@@ -44,6 +45,53 @@ export class UsersService {
 
     // we have a user schema for this, that can take out hashed password with parse
     return UserSchema.parse(user);
+  }
+
+  /**
+   * Find-or-create для OAuth (Google). Якщо email уже є — повертаємо цього юзера
+   * й доповнюємо порожні providerId/avatar (лінкування акаунтів за верифікованим
+   * email); passwordHash не чіпаємо, локальний вхід лишається робочим.
+   */
+  async upsertOAuthUser(data: {
+    email: string;
+    providerId: string;
+    name?: string;
+    avatar?: string;
+  }) {
+    const existing = await this.prismaService.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (existing) {
+      const needsBackfill =
+        (!existing.providerId && !!data.providerId) ||
+        (!existing.avatar && !!data.avatar);
+
+      const user = needsBackfill
+        ? await this.prismaService.user.update({
+            where: { id: existing.id },
+            data: {
+              providerId: existing.providerId ?? data.providerId,
+              avatar: existing.avatar ?? data.avatar,
+            },
+          })
+        : existing;
+
+      return UserSchema.parse(user);
+    }
+
+    const created = await this.prismaService.user.create({
+      data: {
+        email: data.email,
+        name: data.name,
+        avatar: data.avatar,
+        provider: Provider.GOOGLE,
+        providerId: data.providerId,
+        // без passwordHash — вхід лише через Google (пароль можна додати пізніше)
+      },
+    });
+
+    return UserSchema.parse(created);
   }
 
   async findByEmail(email: string) {

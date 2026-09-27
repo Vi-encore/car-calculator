@@ -12,6 +12,7 @@ import { routes } from "./constants/routes";
 import { NotFoundPage } from "./pages/NotFoundPage/NotFoundPage";
 import { Layout } from "./components/Layout/Layout";
 import { CalculationDetailPage } from "./pages/CalculationDetailPage/CalculationDetailPage";
+import { AuthCallbackPage } from "./pages/AuthCallbackPage/AuthCallbackPage";
 import { useGetMeQuery } from "./store/api/authApi";
 import { Loader } from "./ui/Loader/Loader";
 
@@ -42,6 +43,8 @@ export default function App() {
             <Route path={routes.login} element={<LoginPage />} />
             <Route path={routes.register} element={<RegisterPage />} />
           </Route>
+          {/* 🔁 Google OAuth повертається сюди (сесія — з refreshToken-cookie) */}
+          <Route path={routes.authCallback} element={<AuthCallbackPage />} />
           {/* 🔒 Protected routes (Calculator / History / Profile) */}
           <Route element={<ProtectedRoute />}>
             <Route path={routes.calculator} element={<CalculatorPage />} />

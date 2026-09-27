@@ -3,6 +3,7 @@ import { Button } from "../../ui/Button/Button";
 import { routes } from "../../constants/routes";
 import { useRegisterForm } from "./hooks/useRegisterForm";
 import { AuthCard } from "../../components/AuthCard/AuthCard";
+import { GoogleButton } from "../../components/GoogleButton/GoogleButton";
 
 export function RegisterPage() {
   const { register, handleSubmit, errors, isLoading, serverError, onSubmit } =
@@ -43,6 +44,8 @@ export function RegisterPage() {
           Створити акаунт
         </Button>
       </form>
+
+      <GoogleButton label="Зареєструватися через Google" />
     </AuthCard>
   );
 }

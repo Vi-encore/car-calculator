@@ -7,5 +7,6 @@ export const routes = {
   historyDetail: (id: string) => `/history/${id}`,
   historyDetailPattern: "/history/:id",
   profile: "/profile",
+  authCallback: "/auth/callback",
   default: "/",
 } as const;
