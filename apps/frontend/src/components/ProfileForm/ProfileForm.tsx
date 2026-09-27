@@ -1,4 +1,4 @@
-import type { UseFormRegister, FieldErrors, UseFormHandleSubmit } from "react-hook-form";
+import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import type { BaseSyntheticEvent } from "react";
 import { Input } from "../../ui/Input/Input";
 import { Button } from "../../ui/Button/Button";
