@@ -32,7 +32,9 @@ export class CalculationsService {
 
   private selectClosestToAvg(cars: PriceItem[], avgPrice: number): PriceItem[] {
     return [...cars]
-      .sort((a, b) => Math.abs(a.price - avgPrice) - Math.abs(b.price - avgPrice))
+      .sort(
+        (a, b) => Math.abs(a.price - avgPrice) - Math.abs(b.price - avgPrice),
+      )
       .slice(0, CAR_LISTINGS_LIMIT);
   }
 

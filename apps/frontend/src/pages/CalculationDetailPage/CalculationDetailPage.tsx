@@ -10,10 +10,14 @@ import { formatUSD, formatMileage, formatDateFull } from "../../utils/formatters
 export function CalculationDetailPage() {
   const { id } = useParams<{ id: string }>();
 
+  // Хук викликаємо безумовно (Rules of Hooks); коли id немає — skip.
+  const { data: calc, isLoading, isError } = useGetCalculationByIdQuery(
+    id ?? "",
+    { skip: !id },
+  );
+
   // Guard: якщо URL без id — перенаправляємо на список
   if (!id) return <Navigate to={routes.history} replace />;
-
-  const { data: calc, isLoading, isError } = useGetCalculationByIdQuery(id);
 
   if (isLoading) {
     return (

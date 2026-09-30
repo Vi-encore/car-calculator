@@ -55,7 +55,7 @@ const CalculatorFormSchema = z
 
 export type CalculatorFormValues = z.infer<typeof CalculatorFormSchema>;
 
-interface UseCalculatorFormReturn {
+interface UseCalculatorFormResponse {
   register: UseFormRegister<CalculatorFormValues>;
   handleSubmit: UseFormHandleSubmit<CalculatorFormValues>;
   errors: FieldErrors<CalculatorFormValues>;
@@ -66,7 +66,7 @@ interface UseCalculatorFormReturn {
   resetResult: () => void;
 }
 
-export function useCalculatorForm(): UseCalculatorFormReturn {
+export function useCalculatorForm(): UseCalculatorFormResponse {
   const [calculate, { isLoading, data: result, error, reset }] =
     useCalculateMutation();
 

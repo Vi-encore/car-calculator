@@ -15,7 +15,7 @@ export function formatUSD(price: number): string {
  * @example formatMileage(120000) → "120 000 км"
  */
 export function formatMileage(km: number): string {
-  return new Intl.NumberFormat("uk-UA").format(km) + " ��";
+  return new Intl.NumberFormat("uk-UA").format(km) + " км";
 }
 
 /**

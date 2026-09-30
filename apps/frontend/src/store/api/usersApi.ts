@@ -27,6 +27,22 @@ export const usersApi = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    uploadAvatar: builder.mutation<User, FormData>({
+      query: (formData) => ({
+        url: "/users/me/avatar",
+        method: "POST",
+        body: formData,
+      }),
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setCredentials({ user: data }));
+        } catch (e) {
+          console.error(e);
+        }
+      },
+      invalidatesTags: ["User"],
+    }),
     deleteUser: builder.mutation<void, void>({
       query: () => ({
         url: "/users/me",
@@ -48,5 +64,6 @@ export const usersApi = apiSlice.injectEndpoints({
 export const {
   useUpdateProfileMutation,
   useUpdatePasswordMutation,
+  useUploadAvatarMutation,
   useDeleteUserMutation,
 } = usersApi;

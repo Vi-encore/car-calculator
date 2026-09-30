@@ -32,6 +32,7 @@ model User {
   // links
   calculations Calculation[]
   refreshTokens RefreshToken[]
+  passwordResetCodes PasswordResetCode[]
 
   @@map("users")
 
@@ -71,6 +72,21 @@ model CarListing {
   calculation Calculation @relation(fields: [calculationId], references: [id], onDelete: Cascade)
 
   @@map("car_listings")
+}
+
+model PasswordResetCode {
+  id         String    @id @default(uuid())
+  userId     String
+  codeHash   String // bcrypt-хеш 6-значного коду (сам код не зберігаємо)
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_codes")
 }
 
 model RefreshToken {

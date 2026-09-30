@@ -62,7 +62,7 @@ export function HistoryPage() {
             Ще немає жодного розрахунку
           </p>
           <p className="mt-1 text-sm text-slate-400">
-            Зробіть перший розрахунок, і він з'явиться тут
+            {"Зробіть перший розрахунок, і він з'явиться тут"}
           </p>
           <Link to={routes.calculator} className="mt-5 inline-block">
             <Button size="sm">Розрахувати зараз</Button>
