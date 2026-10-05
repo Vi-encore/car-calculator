@@ -25,8 +25,12 @@ jobs:
           node-version: 20
           cache: npm
 
+      # `npm install`, не `npm ci`: у package-lock.json бракує нативних
+      # optional-пакетів @rollup/rollup-* та @esbuild/* (відомий npm-баг —
+      # вони не потрапляють у lockfile). `npm ci` ставить строго за lockfile і
+      # падає на Linux; `npm install` перераховує optional-депи під платформу.
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       # Prisma-клієнт потрібен до компіляції бекенду
       - name: Generate Prisma client
