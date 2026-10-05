@@ -20,6 +20,12 @@
   "engines": {
     "node": ">=22"
   },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": "^10.0.0"
+    }
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
