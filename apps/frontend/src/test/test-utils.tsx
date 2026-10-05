@@ -19,7 +19,7 @@ export function renderWithProviders(
       auth: authReducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
     },
-    preloadedState: preloadedState as any,
+    preloadedState: preloadedState as RootState,
     middleware: (getDefault) => getDefault().concat(apiSlice.middleware),
   });
 

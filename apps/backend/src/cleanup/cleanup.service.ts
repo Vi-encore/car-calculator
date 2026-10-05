@@ -20,4 +20,23 @@ export class CleanupService {
       this.logger.error('Cron Job Failed:', e);
     }
   }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async clearUsedResetCodes() {
+    this.logger.log('Cron Job: Cleaning up password-reset codes...');
+    try {
+      // Прострочені або вже використані коди більше не потрібні.
+      const result = await this.prismaService.passwordResetCode.deleteMany({
+        where: {
+          OR: [
+            { expiresAt: { lt: new Date() } },
+            { consumedAt: { not: null } },
+          ],
+        },
+      });
+      this.logger.log(`Cron Job: Deleted ${result.count} reset codes.`);
+    } catch (e) {
+      this.logger.error('Cron Job Failed:', e);
+    }
+  }
 }

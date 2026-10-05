@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { UploadService } from '../upload/upload.service';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from '@car-calculator/types';
 import * as bcrypt from 'bcrypt';
@@ -15,6 +16,10 @@ const mockPrismaService = {
   },
 };
 
+const mockUploadService = {
+  uploadAvatar: jest.fn(),
+};
+
 describe('UsersService', () => {
   let service: UsersService;
   let prisma: typeof mockPrismaService;
@@ -26,6 +31,10 @@ describe('UsersService', () => {
         {
           provide: PrismaService,
           useValue: mockPrismaService,
+        },
+        {
+          provide: UploadService,
+          useValue: mockUploadService,
         },
       ],
     }).compile();
@@ -51,9 +60,14 @@ describe('UsersService', () => {
 
     it('should throw ConflictException if user already exists', async () => {
       // Налаштовуємо мок
-      prisma.user.findUnique.mockResolvedValueOnce({ id: '1', email: dto.email });
+      prisma.user.findUnique.mockResolvedValueOnce({
+        id: '1',
+        email: dto.email,
+      });
 
-      await expect(service.create(dto)).rejects.toThrow(new ConflictException('User is already registered'));
+      await expect(service.create(dto)).rejects.toThrow(
+        new ConflictException('User is already registered'),
+      );
     });
 
     it('should successfully create and return user without passwordHash', async () => {

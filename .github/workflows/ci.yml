@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, dev]
+
+# Скасовувати застарілі ранами тієї ж гілки/PR
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Type-check · Lint · Test · Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # 22, не 20: jsdom→undici викликає markAsUncloneable (Node ≥22),
+          # інакше vitest не стартує воркери на фронті
+          node-version: 22
+          cache: npm
+
+      # `npm ci` — чистий детермінований install строго за lockfile.
+      # package-lock.json повний і крос-платформний (усі @rolldown/binding-*,
+      # lightningcss-*, @tailwindcss/oxide-*, @unrs/resolver-binding-* для
+      # linux/win32/darwin), тож на Linux-раннері стають правильні нативні
+      # бінарники. (Vite 8 — на Rolldown, тож rollup/esbuild тут немає.)
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      # Prisma-клієнт потрібен до компіляції бекенду
+      - name: Generate Prisma client
+        run: npx prisma generate --schema apps/backend/prisma/schema.prisma
+
+      # Turborepo проганяє обидва застосунки; unit-тести мокають БД,
+      # тож Postgres тут не потрібен
+      - name: Verify
+        run: npx turbo run check-types lint test build

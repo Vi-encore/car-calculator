@@ -3,6 +3,7 @@ import { Button } from "../../ui/Button/Button";
 import { routes } from "../../constants/routes";
 import { useRegisterForm } from "./hooks/useRegisterForm";
 import { AuthCard } from "../../components/AuthCard/AuthCard";
+import { GoogleButton } from "../../components/GoogleButton/GoogleButton";
 
 export function RegisterPage() {
   const { register, handleSubmit, errors, isLoading, serverError, onSubmit } =
@@ -39,10 +40,19 @@ export function RegisterPage() {
           error={errors.password?.message}
           {...register("password")}
         />
+        <Input
+          label="Повторіть пароль"
+          type="password"
+          placeholder="••••••••"
+          error={errors.confirmPassword?.message}
+          {...register("confirmPassword")}
+        />
         <Button type="submit" isLoading={isLoading} className="w-full mt-2">
           Створити акаунт
         </Button>
       </form>
+
+      <GoogleButton label="Зареєструватися через Google" />
     </AuthCard>
   );
 }

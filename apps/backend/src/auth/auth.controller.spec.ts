@@ -6,9 +6,10 @@ import type { Request, Response } from 'express';
 const mockAuthService = {
   register: jest.fn(),
   login: jest.fn(),
+  googleLogin: jest.fn(),
   refreshTokens: jest.fn(),
   logout: jest.fn(),
-  logoutAll: jest.fn(),
+  logoutAllUserSessions: jest.fn(),
 };
 
 // Хелпер для створення моку Response з потрібними методами
@@ -16,6 +17,7 @@ const createMockResponse = () => {
   const res: Partial<Response> = {};
   res.cookie = jest.fn().mockReturnValue(res);
   res.clearCookie = jest.fn().mockReturnValue(res);
+  res.redirect = jest.fn().mockReturnValue(res);
   return res as Response;
 };
 
@@ -60,9 +62,16 @@ describe('AuthController', () => {
         user: { id: '1' },
       });
 
-      const result = await controller.register({ email: 'a@a.com', password: '12345678', name: 'Test' }, res);
+      const result = await controller.register(
+        { email: 'a@a.com', password: '12345678', name: 'Test' },
+        res,
+      );
 
-      expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'refresh', expect.any(Object));
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'refresh',
+        expect.any(Object),
+      );
       expect(result).toEqual({ accessToken: 'access', user: { id: '1' } });
     });
   });
@@ -76,10 +85,44 @@ describe('AuthController', () => {
         user: { id: '1' },
       });
 
-      const result = await controller.login({ email: 'a@a.com', password: '123' }, res);
+      const result = await controller.login(
+        { email: 'a@a.com', password: '123' },
+        res,
+      );
 
-      expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'refresh', expect.any(Object));
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'refresh',
+        expect.any(Object),
+      );
       expect(result).toEqual({ accessToken: 'access', user: { id: '1' } });
+    });
+  });
+
+  describe('googleAuthCallback', () => {
+    it('should set cookie and redirect to the frontend callback', async () => {
+      const req = {
+        user: { providerId: 'g-1', email: 'g@test.com' },
+      } as unknown as Request;
+      const res = createMockResponse();
+
+      mockAuthService.googleLogin.mockResolvedValueOnce({
+        accessToken: 'access',
+        refreshToken: 'refresh',
+        user: { id: '1' },
+      });
+
+      await controller.googleAuthCallback(req, res);
+
+      expect(mockAuthService.googleLogin).toHaveBeenCalledWith(req.user);
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'refresh',
+        expect.any(Object),
+      );
+      expect(res.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('/auth/callback'),
+      );
     });
   });
 
@@ -88,13 +131,15 @@ describe('AuthController', () => {
       const req = createMockRequest();
       const res = createMockResponse();
 
-      await expect(controller.refresh(req, res)).rejects.toThrow('No refresh token provided');
+      await expect(controller.refresh(req, res)).rejects.toThrow(
+        'No refresh token provided',
+      );
     });
 
     it('should set new cookie and return new access token', async () => {
       const req = createMockRequest({ refreshToken: 'old_refresh' });
       const res = createMockResponse();
-      
+
       mockAuthService.refreshTokens.mockResolvedValueOnce({
         accessToken: 'new_access',
         refreshToken: 'new_refresh',
@@ -103,7 +148,11 @@ describe('AuthController', () => {
       const result = await controller.refresh(req, res);
 
       expect(mockAuthService.refreshTokens).toHaveBeenCalledWith('old_refresh');
-      expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'new_refresh', expect.any(Object));
+      expect(res.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'new_refresh',
+        expect.any(Object),
+      );
       expect(result).toEqual({ accessToken: 'new_access' });
     });
   });
@@ -127,7 +176,9 @@ describe('AuthController', () => {
 
       await controller.logoutAll(req, res);
 
-      expect(mockAuthService.logoutAll).toHaveBeenCalledWith('some_token');
+      expect(mockAuthService.logoutAllUserSessions).toHaveBeenCalledWith(
+        'some_token',
+      );
       expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
     });
   });
