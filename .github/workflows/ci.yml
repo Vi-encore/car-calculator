@@ -22,7 +22,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 22, не 20: jsdom→undici викликає markAsUncloneable (Node ≥22),
+          # інакше vitest не стартує воркери на фронті
+          node-version: 22
           cache: npm
 
       # `npm install`, не `npm ci`: у package-lock.json бракує нативних
