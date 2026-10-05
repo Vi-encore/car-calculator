@@ -27,12 +27,13 @@ jobs:
           node-version: 22
           cache: npm
 
-      # `npm install`, не `npm ci`: у package-lock.json бракує нативних
-      # optional-пакетів @rollup/rollup-* та @esbuild/* (відомий npm-баг —
-      # вони не потрапляють у lockfile). `npm ci` ставить строго за lockfile і
-      # падає на Linux; `npm install` перераховує optional-депи під платформу.
+      # `npm ci` — чистий детермінований install строго за lockfile.
+      # package-lock.json повний і крос-платформний (усі @rolldown/binding-*,
+      # lightningcss-*, @tailwindcss/oxide-*, @unrs/resolver-binding-* для
+      # linux/win32/darwin), тож на Linux-раннері стають правильні нативні
+      # бінарники. (Vite 8 — на Rolldown, тож rollup/esbuild тут немає.)
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       # Prisma-клієнт потрібен до компіляції бекенду
       - name: Generate Prisma client
