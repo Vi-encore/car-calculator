@@ -224,15 +224,18 @@ export class AuthService {
     email: string,
     code: string,
   ): Promise<{ userId: string; codeId: string }> {
-    const invalid = new BadRequestException('Невірний або протермінований код');
+    // Свіжий виняток на кожен throw (один інстанс на всі — спільний стек-трейс).
+    const invalidCode = () =>
+      new BadRequestException('Невірний або протермінований код');
 
     const user = await this.prismaService.user.findUnique({ where: { email } });
-    if (!user) throw invalid;
+    if (!user) throw invalidCode();
 
     const record = await this.prismaService.passwordResetCode.findFirst({
       where: { userId: user.id, consumedAt: null },
       orderBy: { createdAt: 'desc' },
     });
+
     const maxAttempts =
       this.configService.get<number>('PASSWORD_RESET_MAX_ATTEMPTS') ?? 5;
 
@@ -241,7 +244,7 @@ export class AuthService {
       record.expiresAt < new Date() ||
       record.attempts >= maxAttempts
     ) {
-      throw invalid;
+      throw invalidCode();
     }
 
     const matches = await bcrypt.compare(code, record.codeHash);
@@ -250,7 +253,7 @@ export class AuthService {
         where: { id: record.id },
         data: { attempts: { increment: 1 } },
       });
-      throw invalid;
+      throw invalidCode();
     }
 
     return { userId: user.id, codeId: record.id };

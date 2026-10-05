@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createTransport, type Transporter } from 'nodemailer';
 import { IMailService } from './mail.interface';
+import { passwordResetEmail } from './templates/password-reset.template';
 
 /** Надсилання пошти через Gmail SMTP (app-password). */
 @Injectable()
@@ -30,19 +31,13 @@ export class GmailMailService extends IMailService {
     code: string,
     ttlMinutes: number,
   ): Promise<void> {
+    const { subject, text, html } = passwordResetEmail(code, ttlMinutes);
     await this.transporter.sendMail({
       from: this.from,
       to,
-      subject: 'Код для скидання пароля — CarCalculator',
-      text:
-        `Ваш код для скидання пароля: ${code}\n\n` +
-        `Код дійсний ${ttlMinutes} хв. Якщо ви не запитували скидання — ` +
-        `просто проігноруйте цей лист.`,
-      html:
-        `<p>Ваш код для скидання пароля:</p>` +
-        `<p style="font-size:24px;font-weight:bold;letter-spacing:4px">${code}</p>` +
-        `<p>Код дійсний ${ttlMinutes} хв. Якщо ви не запитували скидання — ` +
-        `просто проігноруйте цей лист.</p>`,
+      subject,
+      text,
+      html,
     });
     this.logger.log(`Password-reset code sent to ${to}`);
   }
