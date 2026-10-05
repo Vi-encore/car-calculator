@@ -40,6 +40,13 @@ export function RegisterPage() {
           error={errors.password?.message}
           {...register("password")}
         />
+        <Input
+          label="Повторіть пароль"
+          type="password"
+          placeholder="••••••••"
+          error={errors.confirmPassword?.message}
+          {...register("confirmPassword")}
+        />
         <Button type="submit" isLoading={isLoading} className="w-full mt-2">
           Створити акаунт
         </Button>

@@ -34,6 +34,8 @@ export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmError, setConfirmError] = useState<string | null>(null);
 
   const [requestReset, requestState] = useRequestPasswordResetMutation();
   const [verifyCode, verifyState] = useVerifyResetCodeMutation();
@@ -66,6 +68,11 @@ export function ForgotPasswordPage() {
 
   async function onPasswordSubmit(e: FormEvent) {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setConfirmError("Паролі не збігаються");
+      return;
+    }
+    setConfirmError(null);
     try {
       await resetPassword({ email, code, newPassword }).unwrap();
       navigate(routes.login, { replace: true });
@@ -133,6 +140,16 @@ export function ForgotPasswordPage() {
             placeholder="Мінімум 8 символів"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            required
+            minLength={8}
+          />
+          <Input
+            label="Повторіть пароль"
+            type="password"
+            placeholder="••••••••"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            error={confirmError ?? undefined}
             required
             minLength={8}
           />
