@@ -173,3 +173,70 @@ Env `GOOGLE_*` обов'язкові.
 **Рішення.** `CLAUDE.md` — «конституція» (межі, стек, конвенції, definition of
 done, робочий процес), яку Claude Code читає щосесії. `docs/specs/*.md` — спека
 фічі перед кодом. Spec Kit — на потім (адитивний, успадкує ці файли).
+
+---
+
+# 5 жовтня 2026 — CI + підготовка деплою
+
+Гілка `dev`. Спека: [ci-cd-and-deploy.md](specs/ci-cd-and-deploy.md).
+
+## Короткий підсумок
+
+| Напрям | Що зробили | Результат |
+|---|---|---|
+| CI | GitHub Actions (type-check, lint, test, build) | Зелений на `dev`; PR #2 проходить |
+| Build-фікс | `packageManager` замість `devEngines` | Локальний npm 12 більше не блокований |
+| Deploy-prep | Dockerfile, `render.yaml`, `DIRECT_URL`, env | Готово до деплою; перевірено Docker-білдом |
+
+## 11. CI (GitHub Actions)
+
+**Мета.** На кожен PR/push автоматично ганяти типи, lint, тести, build.
+
+**Рішення.** `.github/workflows/ci.yml` — job `verify` на `ubuntu-latest`:
+`npm ci → prisma generate → turbo run check-types lint test build`. Без Postgres
+(unit-тести мокають БД). `concurrency` + `permissions: contents: read`.
+
+**Перший прогін виявив ланцюг прихованих проблем — усі виправлені.**
+- **Node 22, не 20.** jsdom→undici кличе `markAsUncloneable` (є лише з Node 22);
+  на Node 20 vitest не стартує воркери → усі фронт-тести падають. Це був справжній
+  фікс падінь CI.
+- **`npm ci` працює, lockfile повний.** Початковий діагноз («бракує
+  `@rollup/*`/`@esbuild/*`») був хибним: Vite 8 — на **Rolldown**, цих пакетів
+  тут нема взагалі. Lockfile містить нативні бінарники (`@rolldown/binding-*` та
+  ін.) для всіх платформ; перевірено `npm ci` у `node:22` Docker. Регенерувати
+  не треба.
+- **`packageManager` замість `devEngines`.** Turbo потребує поле менеджера
+  пакетів, але `devEngines` форсить npm (EBADDEVENGINES), а локальний npm = 12,
+  CI/Docker = 10.9.9 — одним one-major діапазоном не покрити. Перейшли на
+  legacy-поле `"packageManager": "npm@10.9.9"` (turbo приймає, npm не форсить).
+
+## 12. Підготовка деплою (Render / Neon / Vercel)
+
+**Мета.** Підготувати код, щоб деплой пішов без сюрпризів (сам деплой — коли
+будуть акаунти).
+
+**Dockerfile (критичний фікс).** Стара версія була на **pnpm + Node 20** зі
+скафолду — Render-білд із нею впав би (нема `pnpm-lock.yaml`). Переписали під
+**npm + Node 22**: multi-stage `turbo prune → npm ci → prisma generate → build`;
+runner копіює і backend-локальний `node_modules` (не все хоститься в корінь), і
+prisma-схему/config. Entry — `dist/src/main` (rootDir охоплює `prisma.config.ts`).
+
+**`render.yaml`.** Render Blueprint (Docker web service, free, frankfurt);
+`preDeployCommand = prisma migrate deploy`; секрети `sync:false`, JWT —
+`generateValue`.
+
+**Neon (`DIRECT_URL`).** Міграції на Neon мусять іти через **пряме** (unpooled)
+з'єднання — `prisma.config.ts` тепер бере `DIRECT_URL` (fallback на
+`DATABASE_URL`); рантайм — через pooled `DATABASE_URL`. Додано в `EnvSchema` і
+`.env.example`.
+
+**Інше.** `apps/frontend/.env.production` (`VITE_API_URL`); `dotenv` явно у
+backend devDeps (`prisma.config.ts` його імпортує, а в pruned-образі він губився);
+root `.dockerignore`.
+
+**Верифікація (Docker, `node:22`).** Образ збирається ✅; застосунок бутається
+(`Nest application successfully started`) ✅; `prisma migrate deploy` вантажить
+config+схему ✅; повний `turbo check-types lint test build` — **11/11** ✅.
+
+**Лишилось для деплою.** Neon (БД) → Render (бекенд) → Vercel (фронт, акаунт є)
++ прод Google/пошта. Реальні E2E — за бажанням.
