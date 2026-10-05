@@ -11,6 +11,8 @@ export const EnvSchema = z
     PORT: z.coerce.number().default(3000),
     // DB
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+    // Пряме (unpooled) з'єднання для міграцій на Neon; локально не потрібне
+    DIRECT_URL: z.string().min(1).optional(),
 
     // Secrets size
     JWT_ACCESS_SECRET: z.string().min(32, 'Must be >= 32 chars'),

@@ -1,0 +1,66 @@
+# Render Blueprint (Infrastructure-as-Code) для бекенду car-calculator.
+# Застосувати: Render Dashboard → Blueprints → New → під'єднати цей репо.
+# Секрети (sync:false) Render запитає в дашборді й не зберігає у файлі/гіті.
+# БД — окремо на Neon (serverless Postgres); сюди вписуються лише її URL-и.
+services:
+  - type: web
+    name: car-calculator-api
+    runtime: docker
+    repo: https://github.com/Vi-encore/car-calculator
+    branch: main # деплой із main (злити туди PR перед деплоєм)
+    region: frankfurt # найближчий регіон
+    plan: free # free засинає в простої (холодний старт ~30-60с) — ок для PoC
+    dockerfilePath: ./apps/backend/Dockerfile
+    dockerContext: . # контекст = корінь monorepo (потрібно для turbo prune)
+    # міграції виконуються ПІСЛЯ білду, ПЕРЕД перемиканням на нову версію
+    preDeployCommand: "cd apps/backend && npx prisma migrate deploy"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_ENV
+        value: prod
+      # Neon: pooled URL для рантайму
+      - key: DATABASE_URL
+        sync: false
+      # Neon: пряме (unpooled) з'єднання для міграцій
+      - key: DIRECT_URL
+        sync: false
+      # JWT-секрети Render згенерує сам (довгі, безпечні)
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      # URL фронтенду на Vercel (для CORS + редіректів OAuth)
+      - key: FRONTEND_URL
+        sync: false
+      # Google OAuth (прод-клієнт; redirect URI = GOOGLE_CALLBACK_URL)
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+      # Пошта (Gmail SMTP — коди скидання пароля)
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: "465"
+      - key: MAIL_USER
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      # Cloudinary (аватарки)
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # Ціни: mock за замовчуванням. Для реальних даних AUTO.RIA —
+      # змінити на "autoria" і задати AUTO_RIA_API_KEY у дашборді.
+      - key: PRICES_PROVIDER
+        value: mock
+      - key: AUTO_RIA_API_KEY
+        sync: false

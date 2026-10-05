@@ -9,6 +9,10 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // CLI/міграції: пряме (unpooled) з'єднання, якщо задано DIRECT_URL
+    // (потрібно для Neon — міграції не люблять pgbouncer). Локально DIRECT_URL
+    // нема → використовуємо DATABASE_URL. Рантайм застосунку підключається
+    // окремо через driver-adapter у PrismaService (теж DATABASE_URL).
+    url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
   },
 });

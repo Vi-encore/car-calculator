@@ -1,0 +1,15 @@
+# Контекст Docker-білду (turbo prune потребує корінь monorepo).
+# Не тягнути у контекст важке/локальне — ставиться чисто через npm ci.
+**/node_modules
+**/dist
+**/.turbo
+**/coverage
+**/*.log
+.git
+.github
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.production
+docs
+*.md
