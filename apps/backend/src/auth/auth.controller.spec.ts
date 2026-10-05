@@ -165,7 +165,10 @@ describe('AuthController', () => {
       await controller.logout(req, res);
 
       expect(mockAuthService.logout).toHaveBeenCalledWith('some_token');
-      expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
+      expect(res.clearCookie).toHaveBeenCalledWith(
+        'refreshToken',
+        expect.any(Object),
+      );
     });
   });
 
@@ -179,7 +182,10 @@ describe('AuthController', () => {
       expect(mockAuthService.logoutAllUserSessions).toHaveBeenCalledWith(
         'some_token',
       );
-      expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
+      expect(res.clearCookie).toHaveBeenCalledWith(
+        'refreshToken',
+        expect.any(Object),
+      );
     });
   });
 });
