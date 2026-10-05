@@ -50,5 +50,6 @@ COPY --from=builder /app/apps/backend/prisma.config.ts ./apps/backend/prisma.con
 USER nestjs
 # Render сам інжектить PORT; EXPOSE — лише документація
 EXPOSE 3000
-# entry у dist/src/main.js (rootDir охоплює і prisma.config.ts)
-CMD ["node", "apps/backend/dist/src/main"]
+# На старті застосовуємо міграції (free-тариф не має preDeployCommand), потім Nest.
+# entry у dist/src/main.js (rootDir охоплює і prisma.config.ts).
+CMD ["sh", "-c", "cd /app/apps/backend && npx --no-install prisma migrate deploy && node dist/src/main"]
