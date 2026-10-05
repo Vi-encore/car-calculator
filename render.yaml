@@ -12,8 +12,8 @@ services:
     plan: free # free засинає в простої (холодний старт ~30-60с) — ок для PoC
     dockerfilePath: ./apps/backend/Dockerfile
     dockerContext: . # контекст = корінь monorepo (потрібно для turbo prune)
-    # міграції виконуються ПІСЛЯ білду, ПЕРЕД перемиканням на нову версію
-    preDeployCommand: "cd apps/backend && npx prisma migrate deploy"
+    # free-тариф НЕ підтримує preDeployCommand — міграції виконуються у старті
+    # контейнера (CMD у Dockerfile: `prisma migrate deploy` перед запуском Nest)
     envVars:
       - key: NODE_ENV
         value: production
