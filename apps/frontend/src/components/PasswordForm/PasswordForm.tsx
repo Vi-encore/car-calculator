@@ -2,12 +2,13 @@ import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import type { BaseSyntheticEvent } from "react";
 import { Input } from "../../ui/Input/Input";
 import { Button } from "../../ui/Button/Button";
-import type { UpdatePasswordDto } from "@car-calculator/types";
+import type { UpdatePasswordFormValues } from "../../pages/ProfilePage/hooks/usePasswordForm";
 
 interface PasswordFormProps {
-  readonly register: UseFormRegister<UpdatePasswordDto>;
+  readonly register: UseFormRegister<UpdatePasswordFormValues>;
   readonly onSubmit: (e?: BaseSyntheticEvent) => Promise<void> | void;
-  readonly errors: FieldErrors<UpdatePasswordDto>;
+  readonly errors: FieldErrors<UpdatePasswordFormValues>;
+  readonly isValid: boolean;
   readonly isLoading: boolean;
   readonly isSuccess: boolean;
   readonly serverError: string | null;
@@ -17,6 +18,7 @@ export function PasswordForm({
   register,
   onSubmit,
   errors,
+  isValid,
   isLoading,
   isSuccess,
   serverError,
@@ -41,6 +43,13 @@ export function PasswordForm({
           error={errors.newPassword?.message}
           {...register("newPassword")}
         />
+        <Input
+          label="Повторіть новий пароль"
+          type="password"
+          placeholder="••••••••"
+          error={errors.confirmPassword?.message}
+          {...register("confirmPassword")}
+        />
 
         {serverError && (
           <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
@@ -55,7 +64,11 @@ export function PasswordForm({
         )}
 
         <div className="mt-2 flex justify-end">
-          <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+          <Button
+            type="submit"
+            disabled={isLoading || !isValid}
+            className="w-full sm:w-auto"
+          >
             {isLoading ? "Оновлення..." : "Оновити пароль"}
           </Button>
         </div>
