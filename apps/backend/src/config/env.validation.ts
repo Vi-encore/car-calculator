@@ -35,12 +35,17 @@ export const EnvSchema = z
     GOOGLE_CLIENT_SECRET: z.string().min(1),
     GOOGLE_CALLBACK_URL: z.string().url('Must be a valid URL'),
 
-    // Mail (Gmail SMTP — password-reset codes)
-    MAIL_HOST: z.string().min(1),
-    MAIL_PORT: z.coerce.number().int().default(465),
-    MAIL_USER: z.string().min(1),
-    MAIL_PASSWORD: z.string().min(1),
+    // Mail (password-reset codes). Провайдер: gmail (SMTP, локально) або
+    // brevo (HTTP-API, прод — Render free блокує SMTP-порти).
+    MAIL_PROVIDER: z.enum(['gmail', 'brevo']).default('gmail'),
     MAIL_FROM: z.string().min(1),
+    // SMTP — лише коли MAIL_PROVIDER=gmail
+    MAIL_HOST: z.string().min(1).optional(),
+    MAIL_PORT: z.coerce.number().int().default(465),
+    MAIL_USER: z.string().min(1).optional(),
+    MAIL_PASSWORD: z.string().min(1).optional(),
+    // HTTP-API ключ — лише коли MAIL_PROVIDER=brevo
+    BREVO_API_KEY: z.string().min(1).optional(),
 
     // Password reset
     PASSWORD_RESET_CODE_TTL_MIN: z.coerce.number().int().min(1).default(10),
@@ -64,6 +69,22 @@ export const EnvSchema = z
       message: 'AUTO_RIA_API_KEY is required when PRICES_PROVIDER=autoria',
       path: ['AUTO_RIA_API_KEY'],
     },
-  );
+  )
+  // Gmail-провайдер потребує SMTP-креденшлів.
+  .refine(
+    (env) =>
+      env.MAIL_PROVIDER !== 'gmail' ||
+      (!!env.MAIL_HOST && !!env.MAIL_USER && !!env.MAIL_PASSWORD),
+    {
+      message:
+        'MAIL_HOST, MAIL_USER, MAIL_PASSWORD are required when MAIL_PROVIDER=gmail',
+      path: ['MAIL_HOST'],
+    },
+  )
+  // Brevo-провайдер потребує API-ключа.
+  .refine((env) => env.MAIL_PROVIDER !== 'brevo' || !!env.BREVO_API_KEY, {
+    message: 'BREVO_API_KEY is required when MAIL_PROVIDER=brevo',
+    path: ['BREVO_API_KEY'],
+  });
 
 export type Env = z.infer<typeof EnvSchema>;
