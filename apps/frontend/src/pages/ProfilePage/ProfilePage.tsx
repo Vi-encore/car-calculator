@@ -24,6 +24,7 @@ export function ProfilePage() {
     register: passwordRegister,
     handleSubmit: passwordHandleSubmit,
     errors: passwordErrors,
+    isValid: passwordIsValid,
     isLoading: passwordIsLoading,
     isSuccess: passwordIsSuccess,
     serverError: passwordServerError,
@@ -73,6 +74,7 @@ export function ProfilePage() {
           register={passwordRegister}
           onSubmit={passwordHandleSubmit(passwordOnSubmit)}
           errors={passwordErrors}
+          isValid={passwordIsValid}
           isLoading={passwordIsLoading}
           isSuccess={passwordIsSuccess}
           serverError={passwordServerError}

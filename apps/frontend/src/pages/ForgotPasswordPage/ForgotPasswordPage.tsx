@@ -35,7 +35,10 @@ export function ForgotPasswordPage() {
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [confirmError, setConfirmError] = useState<string | null>(null);
+
+  // Збіг нового пароля з підтвердженням (наживо → блокуємо кнопку)
+  const passwordsMatch = newPassword === confirmPassword;
+  const canSubmitPassword = newPassword.length >= 8 && passwordsMatch;
 
   const [requestReset, requestState] = useRequestPasswordResetMutation();
   const [verifyCode, verifyState] = useVerifyResetCodeMutation();
@@ -68,11 +71,7 @@ export function ForgotPasswordPage() {
 
   async function onPasswordSubmit(e: FormEvent) {
     e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setConfirmError("Паролі не збігаються");
-      return;
-    }
-    setConfirmError(null);
+    if (!canSubmitPassword) return; // кнопка і так заблокована — захист
     try {
       await resetPassword({ email, code, newPassword }).unwrap();
       navigate(routes.login, { replace: true });
@@ -149,13 +148,18 @@ export function ForgotPasswordPage() {
             placeholder="••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            error={confirmError ?? undefined}
+            error={
+              confirmPassword.length > 0 && !passwordsMatch
+                ? "Паролі не збігаються"
+                : undefined
+            }
             required
             minLength={8}
           />
           <Button
             type="submit"
             isLoading={resetState.isLoading}
+            disabled={!canSubmitPassword}
             className="w-full mt-2"
           >
             Змінити пароль
