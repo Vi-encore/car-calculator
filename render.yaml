@@ -55,9 +55,11 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
-      # Ціни: mock за замовчуванням. Для реальних даних AUTO.RIA —
-      # змінити на "autoria" і задати AUTO_RIA_API_KEY у дашборді.
+      # Ціни: реальні дані AUTO.RIA (з авто-fallback на mock, якщо API впаде
+      # чи вичерпається бюджет-guard). AUTO_RIA_API_KEY — секрет (sync:false),
+      # МАЄ бути заданий у дашборді, інакше бек не стартує (EnvSchema refine).
+      # Щоб тимчасово вимкнути реальні дані — постав PRICES_PROVIDER=mock у дашборді.
       - key: PRICES_PROVIDER
-        value: mock
+        value: autoria
       - key: AUTO_RIA_API_KEY
         sync: false
