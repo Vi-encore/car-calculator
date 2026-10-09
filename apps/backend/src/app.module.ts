@@ -26,6 +26,16 @@ import { CleanupModule } from './cleanup/cleanup.module';
     }),
     LoggerModule.forRoot({
       pinoHttp: {
+        // Не світити секрети в логах: access-токен (Authorization: Bearer),
+        // refresh-токен (cookie `refreshToken`) і Set-Cookie у відповідях.
+        redact: {
+          paths: [
+            'req.headers.authorization',
+            'req.headers.cookie',
+            'res.headers["set-cookie"]',
+          ],
+          censor: '[REDACTED]',
+        },
         ...(process.env.NODE_ENV !== 'production' && {
           transport: { target: 'pino-pretty', options: { singleLine: true } },
         }),
