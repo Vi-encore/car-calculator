@@ -17,7 +17,8 @@ echo "→ ECR login: ${REGISTRY}"
 aws ecr get-login-password --region "${REGION}" |
   docker login --username AWS --password-stdin "${REGISTRY}"
 
-for app in backend frontend; do
+# APPS="frontend" — зібрати лише частину (напр. після правки одного застосунку).
+for app in ${APPS:-backend frontend}; do
   repo="${REGISTRY}/car-calc-${app}${SUFFIX}"
   echo "→ build ${app} (${TAG})"
   # Контекст = корінь monorepo (turbo prune усередині Dockerfile).
