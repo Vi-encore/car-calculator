@@ -1,6 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { ConfigService } from '@nestjs/config';
+import type { Env } from '../../config/env.validation';
 
 /** Профіль Google-користувача, який ми передаємо далі в AuthService. */
 export interface GoogleUser {
@@ -10,13 +12,21 @@ export interface GoogleUser {
   avatar?: string;
 }
 
+// Коли GOOGLE_AUTH_ENABLED=false, креденшлів немає, а passport-google
+// вимагає непорожні значення при створенні стратегії. Плейсхолдер безпечний:
+// маршрути /auth/google* закриває GoogleAuthGuard (404) ще до стратегії.
+const DISABLED = 'disabled';
+
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor() {
+  constructor(config: ConfigService<Env, true>) {
     super({
-      clientID: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL as string,
+      clientID: config.get('GOOGLE_CLIENT_ID', { infer: true }) ?? DISABLED,
+      clientSecret:
+        config.get('GOOGLE_CLIENT_SECRET', { infer: true }) ?? DISABLED,
+      callbackURL:
+        config.get('GOOGLE_CALLBACK_URL', { infer: true }) ??
+        'http://localhost/disabled',
       scope: ['email', 'profile'],
     });
   }

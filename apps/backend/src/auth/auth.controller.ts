@@ -19,7 +19,7 @@ import {
   VerifyResetCodeDto,
 } from './dtos';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
-import { AuthGuard } from '@nestjs/passport';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 import {
   GLOBAL_THROTTLER_TTL_MS,
   LOGIN_THROTTLE_LIMIT,
@@ -154,7 +154,7 @@ export class AuthController {
   // Ініціює OAuth: passport редіректить на згоду Google (тіло не потрібне).
   @Get('google')
   @SkipThrottle()
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   googleAuth() {
     // no-op: AuthGuard('google') виконує редірект
   }
@@ -163,7 +163,7 @@ export class AuthController {
   // токен не кладемо в URL — сесію фронт підхопить із refreshToken-cookie.
   @Get('google/callback')
   @SkipThrottle()
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
     const googleUser = req.user as GoogleUser;
     const { refreshToken } = await this.authService.googleLogin(googleUser);
