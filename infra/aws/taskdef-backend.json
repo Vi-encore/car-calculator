@@ -1,5 +1,5 @@
 {
-  "family": "car-calc-backend",
+  "family": "car-calc-backend-matiushko",
   "requiresCompatibilities": ["FARGATE"],
   "networkMode": "awsvpc",
   "cpu": "512",
@@ -13,7 +13,7 @@
   "containerDefinitions": [
     {
       "name": "backend",
-      "image": "703697786238.dkr.ecr.us-east-1.amazonaws.com/car-calc-backend:latest",
+      "image": "703697786238.dkr.ecr.us-east-1.amazonaws.com/car-calc-backend-matiushko:latest",
       "essential": true,
       "portMappings": [
         { "containerPort": 3000, "protocol": "tcp", "appProtocol": "http" }
@@ -27,24 +27,24 @@
         { "name": "COOKIE_MODE", "value": "same-site" },
         { "name": "FRONTEND_URL", "value": "http://<ALB_DNS>" },
         { "name": "AVATAR_STORAGE", "value": "s3" },
-        { "name": "S3_AVATARS_BUCKET", "value": "<BUCKET_NAME>" },
+        { "name": "S3_AVATARS_BUCKET", "value": "focc-car-calc-avatars-matiushko" },
         { "name": "AWS_REGION", "value": "us-east-1" },
         { "name": "GOOGLE_AUTH_ENABLED", "value": "false" },
         { "name": "MAIL_PROVIDER", "value": "brevo" },
-        { "name": "MAIL_FROM", "value": "CarCalculator <your-verified-sender@example.com>" },
+        { "name": "MAIL_FROM", "value": "<MAIL_FROM: вписати в консолі>" },
         { "name": "PRICES_PROVIDER", "value": "mock" }
       ],
       "secrets": [
-        { "name": "DATABASE_URL", "valueFrom": "<SECRET_ARN>:DATABASE_URL::" },
-        { "name": "DIRECT_URL", "valueFrom": "<SECRET_ARN>:DIRECT_URL::" },
-        { "name": "JWT_ACCESS_SECRET", "valueFrom": "<SECRET_ARN>:JWT_ACCESS_SECRET::" },
-        { "name": "JWT_REFRESH_SECRET", "valueFrom": "<SECRET_ARN>:JWT_REFRESH_SECRET::" },
-        { "name": "BREVO_API_KEY", "valueFrom": "<SECRET_ARN>:BREVO_API_KEY::" }
+        { "name": "DATABASE_URL", "valueFrom": "arn:aws:secretsmanager:us-east-1:703697786238:secret:focc-car-calc-backend-matiushko-idm1OC:DATABASE_URL::" },
+        { "name": "DIRECT_URL", "valueFrom": "arn:aws:secretsmanager:us-east-1:703697786238:secret:focc-car-calc-backend-matiushko-idm1OC:DIRECT_URL::" },
+        { "name": "JWT_ACCESS_SECRET", "valueFrom": "arn:aws:secretsmanager:us-east-1:703697786238:secret:focc-car-calc-backend-matiushko-idm1OC:JWT_ACCESS_SECRET::" },
+        { "name": "JWT_REFRESH_SECRET", "valueFrom": "arn:aws:secretsmanager:us-east-1:703697786238:secret:focc-car-calc-backend-matiushko-idm1OC:JWT_REFRESH_SECRET::" },
+        { "name": "BREVO_API_KEY", "valueFrom": "arn:aws:secretsmanager:us-east-1:703697786238:secret:focc-car-calc-backend-matiushko-idm1OC:BREVO_API_KEY::" }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/car-calc-backend",
+          "awslogs-group": "/ecs/car-calc-backend-matiushko",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "backend"
         }

@@ -1,5 +1,5 @@
 {
-  "family": "car-calc-frontend",
+  "family": "car-calc-frontend-matiushko",
   "requiresCompatibilities": ["FARGATE"],
   "networkMode": "awsvpc",
   "cpu": "256",
@@ -12,7 +12,7 @@
   "containerDefinitions": [
     {
       "name": "frontend",
-      "image": "703697786238.dkr.ecr.us-east-1.amazonaws.com/car-calc-frontend:latest",
+      "image": "703697786238.dkr.ecr.us-east-1.amazonaws.com/car-calc-frontend-matiushko:latest",
       "essential": true,
       "portMappings": [
         { "containerPort": 80, "protocol": "tcp", "appProtocol": "http" }
@@ -20,7 +20,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/car-calc-frontend",
+          "awslogs-group": "/ecs/car-calc-frontend-matiushko",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "frontend"
         }

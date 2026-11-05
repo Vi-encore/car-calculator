@@ -11,14 +11,14 @@ access keys, термінал — лише CloudShell). Робимо **по по
 
 | Ресурс | Назва |
 |---|---|
-| VPC | `car-calc-vpc` |
-| Security groups | `car-calc-alb-sg`, `car-calc-ecs-sg`, `car-calc-rds-sg` |
-| S3 bucket | `focc-car-calc-avatars-<ваші ініціали>` (ім'я глобально унікальне) |
+| VPC | `car-calc-matiushko-vpc` |
+| Security groups | `car-calc-alb-sg-matiushko`, `car-calc-ecs-sg-matiushko`, `car-calc-rds-sg-matiushko` |
+| S3 bucket | `focc-car-calc-avatars-matiushko` (ім'я глобально унікальне) |
 | IAM roles | `focc-ecs-task-execution-matiushko`, `focc-ecs-task-matiushko` |
-| RDS | `car-calc-db` |
-| Secret | `car-calc/backend` |
-| ECR | `car-calc-backend`, `car-calc-frontend` |
-| Log groups | `/ecs/car-calc-backend`, `/ecs/car-calc-frontend` |
+| RDS | `car-calc-db-matiushko` |
+| Secret | `focc-car-calc-backend-matiushko` |
+| ECR | `car-calc-backend-matiushko`, `car-calc-frontend-matiushko` |
+| Log groups | `/ecs/car-calc-backend-matiushko`, `/ecs/car-calc-frontend-matiushko` |
 | ALB / target groups | `car-calc-alb` / `car-calc-backend-tg`, `car-calc-frontend-tg` |
 | ECS cluster / services | `car-calc-cluster` / `car-calc-backend`, `car-calc-frontend` |
 | SNS topic | `car-calc-alerts` |
@@ -45,7 +45,7 @@ ECR (образи) · Secrets Manager (секрети) · CloudWatch (логи, 
 ## 1. S3 — бакет для аватарок
 
 S3 → **Create bucket**
-- Bucket type: General purpose · Name: `focc-car-calc-avatars-<ініціали>`
+- Bucket type: General purpose · Name: `focc-car-calc-avatars-matiushko`
 - Object Ownership: ACLs disabled
 - **Block all public access: ✅ увімкнено** (файли віддає бекенд)
 - Versioning: disabled · Encryption: SSE-S3 (дефолт)
@@ -88,30 +88,30 @@ VPC → **Create VPC** → **VPC and more**
 
 ## 4. Security Groups
 
-EC2 → Security Groups → **Create security group** (VPC: `car-calc-vpc`), по черзі:
+EC2 → Security Groups → **Create security group** (VPC: `car-calc-matiushko-vpc`), по черзі:
 
 | SG | Inbound | Source |
 |---|---|---|
-| `car-calc-alb-sg` | HTTP 80 | `0.0.0.0/0` |
-| `car-calc-ecs-sg` | Custom TCP 3000 | `car-calc-alb-sg` |
-|  | HTTP 80 | `car-calc-alb-sg` |
-| `car-calc-rds-sg` | PostgreSQL 5432 | `car-calc-ecs-sg` |
+| `car-calc-alb-sg-matiushko` | HTTP 80 | `0.0.0.0/0` |
+| `car-calc-ecs-sg-matiushko` | Custom TCP 3000 | `car-calc-alb-sg-matiushko` |
+|  | HTTP 80 | `car-calc-alb-sg-matiushko` |
+| `car-calc-rds-sg-matiushko` | PostgreSQL 5432 | `car-calc-ecs-sg-matiushko` |
 
 Outbound у всіх — дефолт (All traffic). 📸 inbound rules кожної SG.
 
 ## 5. RDS — PostgreSQL
 
-**5.1.** RDS → Subnet groups → **Create DB subnet group**: `car-calc-db-subnets`,
-VPC `car-calc-vpc`, обидві AZ, лише **private** підмережі.
+**5.1.** RDS → Subnet groups → **Create DB subnet group**: `car-calc-db-subnets-matiushko`,
+VPC `car-calc-matiushko-vpc`, обидві AZ, лише **private** підмережі.
 
 **5.2.** RDS → **Create database** → Standard create
 - Engine: **PostgreSQL** (остання 17.x) · Template: **Free tier** (або Dev/Test → Single-AZ)
-- DB instance identifier: `car-calc-db`
+- DB instance identifier: `car-calc-db-matiushko`
 - Master username: `postgres` · Credentials management: **Self managed**,
   пароль **лише з літер і цифр** (≥ 20 символів) — він піде в URL; збережіть його
 - Instance: **db.t4g.micro** · Storage: gp3, **20 GiB**, autoscaling вимкнути
-- Connectivity: VPC `car-calc-vpc`, subnet group `car-calc-db-subnets`,
-  **Public access: No**, SG: `car-calc-rds-sg` (прибрати `default`)
+- Connectivity: VPC `car-calc-matiushko-vpc`, subnet group `car-calc-db-subnets-matiushko`,
+  **Public access: No**, SG: `car-calc-rds-sg-matiushko` (прибрати `default`)
 - Database authentication: Password
 - Monitoring: Performance Insights — вимкнути (економія)
 - Additional configuration → **Initial database name: `car_calculator`**,
@@ -130,7 +130,7 @@ Secrets Manager → **Store a new secret** → *Other type of secret* → Key/va
 | `JWT_REFRESH_SECRET` | інші 64 hex-символи |
 | `BREVO_API_KEY` | ваш ключ Brevo (той самий, що на Render) |
 
-Secret name: `car-calc/backend` → Store → скопіювати **Secret ARN**. 📸
+Secret name: `focc-car-calc-backend-matiushko` → Store → скопіювати **Secret ARN**. 📸
 
 Згенерувати JWT-секрети (CloudShell): `openssl rand -hex 32` (двічі).
 
@@ -142,12 +142,12 @@ Secret name: `car-calc/backend` → Store → скопіювати **Secret ARN*
 ## 7. CloudWatch — log groups
 
 CloudWatch → Logs → Log groups → **Create log group**:
-`/ecs/car-calc-backend` і `/ecs/car-calc-frontend`, Retention: **1 week**.
+`/ecs/car-calc-backend-matiushko` і `/ecs/car-calc-frontend-matiushko`, Retention: **1 week**.
 
 ## 8. ECR — репозиторії образів
 
-ECR → Private registry → **Create repository**: `car-calc-backend`, потім
-`car-calc-frontend` (Image scan on push ✅, tag mutability: Mutable).
+ECR → Private registry → **Create repository**: `car-calc-backend-matiushko`, потім
+`car-calc-frontend-matiushko` (Image scan on push ✅, tag mutability: Mutable).
 
 ## 9. CloudShell — збірка і push образів
 
@@ -171,7 +171,7 @@ bash infra/aws/build-and-push.sh
 ## 10. ALB — балансувальник
 
 **10.1. Target groups** (EC2 → Target Groups → Create), обидві: target type
-**IP addresses**, VPC `car-calc-vpc`, protocol HTTP, **без реєстрації таргетів** (ECS зробить сам):
+**IP addresses**, VPC `car-calc-matiushko-vpc`, protocol HTTP, **без реєстрації таргетів** (ECS зробить сам):
 
 | Target group | Port | Health check path |
 |---|---|---|
@@ -182,8 +182,8 @@ Advanced health check: healthy threshold 2, interval 15s.
 
 **10.2.** EC2 → Load Balancers → **Create** → Application Load Balancer
 - Name `car-calc-alb` · **Internet-facing** · IPv4
-- VPC `car-calc-vpc`, обидві AZ → **public** підмережі
-- SG: `car-calc-alb-sg` (прибрати `default`)
+- VPC `car-calc-matiushko-vpc`, обидві AZ → **public** підмережі
+- SG: `car-calc-alb-sg-matiushko` (прибрати `default`)
 - Listener HTTP:80 → default action: forward to `car-calc-frontend-tg`
 - Create → скопіювати **DNS name** (`car-calc-alb-…us-east-1.elb.amazonaws.com`)
 
@@ -211,7 +211,7 @@ Insights: ✅** (метрики CPU/пам'яті тасків для дашбо
 - Compute: **Launch type FARGATE**, platform LATEST
 - Application type: Service · Task definition: відповідна, остання ревізія
 - Service name `car-calc-backend` / `car-calc-frontend` · Desired tasks: **1**
-- Networking: VPC `car-calc-vpc`, **public** підмережі, SG `car-calc-ecs-sg`,
+- Networking: VPC `car-calc-matiushko-vpc`, **public** підмережі, SG `car-calc-ecs-sg-matiushko`,
   **Public IP: ON**
 - Load balancing: Application Load Balancer → existing `car-calc-alb` →
   container `backend 3000` / `frontend 80` → existing listener 80 →
@@ -220,7 +220,7 @@ Insights: ✅** (метрики CPU/пам'яті тасків для дашбо
 - Service auto scaling — налаштуємо в кроці 13
 
 Перевірка: Target groups → Targets = **healthy**; логи в CloudWatch
-`/ecs/car-calc-backend` (має бути `prisma migrate deploy` і `Nest application successfully started`).
+`/ecs/car-calc-backend-matiushko` (має бути `prisma migrate deploy` і `Nest application successfully started`).
 
 📸 кластер (Services: Running 1/1), task details, target groups healthy.
 
@@ -259,7 +259,7 @@ ECS → `car-calc-backend` → **Update service** → Service auto scaling ✅
 | `car-calc-alb-5xx` | ApplicationELB → per-LB → `HTTPCode_Target_5XX_Count` (Sum, 5 хв) | ≥ 10 |
 | `car-calc-backend-unhealthy` | ApplicationELB → per-TG → `UnHealthyHostCount` (`car-calc-backend-tg`, Max, 1 хв) | ≥ 1 (2 з 2 точок) |
 | `car-calc-backend-cpu-high` | ECS → ClusterName, ServiceName → `CPUUtilization` (Avg, 5 хв) | > 80 |
-| `car-calc-rds-cpu-high` | RDS → `car-calc-db` → `CPUUtilization` (Avg, 5 хв) | > 80 |
+| `car-calc-rds-cpu-high` | RDS → `car-calc-db-matiushko` → `CPUUtilization` (Avg, 5 хв) | > 80 |
 | `car-calc-rds-storage-low` | RDS → `FreeStorageSpace` (Min, 5 хв) | < 2 GB (2147483648) |
 
 **14.3.** CloudWatch → Dashboards → **Create** `car-calc`: віджети ALB

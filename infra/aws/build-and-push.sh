@@ -8,6 +8,8 @@ REGION="${AWS_REGION:-us-east-1}"
 ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 REGISTRY="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
 TAG="${1:-$(git rev-parse --short HEAD)}"
+# Акаунт спільний для групи — суфікс робить назви репозиторіїв унікальними.
+SUFFIX="${REPO_SUFFIX:--matiushko}"
 
 cd "$(git rev-parse --show-toplevel)"
 
@@ -16,7 +18,7 @@ aws ecr get-login-password --region "${REGION}" |
   docker login --username AWS --password-stdin "${REGISTRY}"
 
 for app in backend frontend; do
-  repo="${REGISTRY}/car-calc-${app}"
+  repo="${REGISTRY}/car-calc-${app}${SUFFIX}"
   echo "→ build ${app} (${TAG})"
   # Контекст = корінь monorepo (turbo prune усередині Dockerfile).
   docker build -f "apps/${app}/Dockerfile" -t "${repo}:${TAG}" -t "${repo}:latest" .
@@ -27,5 +29,5 @@ for app in backend frontend; do
   docker system prune -af >/dev/null
 done
 
-echo "✓ Готово. Образи: ${REGISTRY}/car-calc-{backend,frontend}:{${TAG},latest}"
+echo "✓ Готово. Образи: ${REGISTRY}/car-calc-{backend,frontend}${SUFFIX}:{${TAG},latest}"
 echo "  Далі: ECS → service → Update → Force new deployment."
