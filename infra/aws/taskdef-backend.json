@@ -1,0 +1,54 @@
+{
+  "family": "car-calc-backend",
+  "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "awsvpc",
+  "cpu": "512",
+  "memory": "1024",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "executionRoleArn": "arn:aws:iam::703697786238:role/focc-ecs-task-execution",
+  "taskRoleArn": "arn:aws:iam::703697786238:role/focc-ecs-task",
+  "containerDefinitions": [
+    {
+      "name": "backend",
+      "image": "703697786238.dkr.ecr.us-east-1.amazonaws.com/car-calc-backend:latest",
+      "essential": true,
+      "portMappings": [
+        { "containerPort": 3000, "protocol": "tcp", "appProtocol": "http" }
+      ],
+      "environment": [
+        { "name": "NODE_ENV", "value": "production" },
+        { "name": "APP_ENV", "value": "prod" },
+        { "name": "PORT", "value": "3000" },
+        { "name": "API_PREFIX", "value": "api" },
+        { "name": "TRUST_PROXY", "value": "true" },
+        { "name": "COOKIE_MODE", "value": "same-site" },
+        { "name": "FRONTEND_URL", "value": "http://<ALB_DNS>" },
+        { "name": "AVATAR_STORAGE", "value": "s3" },
+        { "name": "S3_AVATARS_BUCKET", "value": "<BUCKET_NAME>" },
+        { "name": "AWS_REGION", "value": "us-east-1" },
+        { "name": "GOOGLE_AUTH_ENABLED", "value": "false" },
+        { "name": "MAIL_PROVIDER", "value": "brevo" },
+        { "name": "MAIL_FROM", "value": "CarCalculator <your-verified-sender@example.com>" },
+        { "name": "PRICES_PROVIDER", "value": "mock" }
+      ],
+      "secrets": [
+        { "name": "DATABASE_URL", "valueFrom": "<SECRET_ARN>:DATABASE_URL::" },
+        { "name": "DIRECT_URL", "valueFrom": "<SECRET_ARN>:DIRECT_URL::" },
+        { "name": "JWT_ACCESS_SECRET", "valueFrom": "<SECRET_ARN>:JWT_ACCESS_SECRET::" },
+        { "name": "JWT_REFRESH_SECRET", "valueFrom": "<SECRET_ARN>:JWT_REFRESH_SECRET::" },
+        { "name": "BREVO_API_KEY", "valueFrom": "<SECRET_ARN>:BREVO_API_KEY::" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/car-calc-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "backend"
+        }
+      }
+    }
+  ]
+}
