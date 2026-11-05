@@ -1,21 +1,26 @@
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { Env } from '../config/env.validation';
 import {
   v2 as cloudinary,
   type UploadApiErrorResponse,
   type UploadApiResponse,
 } from 'cloudinary';
-import { IAvatarStorage } from './avatar-storage.interface';
+import { type AvatarObject, IAvatarStorage } from './avatar-storage.interface';
 
 export class CloudinaryAvatarStorage extends IAvatarStorage {
   private readonly logger = new Logger(CloudinaryAvatarStorage.name);
 
-  constructor(configService: ConfigService) {
+  constructor(configService: ConfigService<Env, true>) {
     super();
     cloudinary.config({
-      cloud_name: configService.get<string>('CLOUDINARY_CLOUD_NAME'),
-      api_key: configService.get<string>('CLOUDINARY_API_KEY'),
-      api_secret: configService.get<string>('CLOUDINARY_API_SECRET'),
+      cloud_name: configService.get('CLOUDINARY_CLOUD_NAME', { infer: true }),
+      api_key: configService.get('CLOUDINARY_API_KEY', { infer: true }),
+      api_secret: configService.get('CLOUDINARY_API_SECRET', { infer: true }),
     });
   }
 
@@ -50,5 +55,10 @@ export class CloudinaryAvatarStorage extends IAvatarStorage {
 
       stream.end(file.buffer);
     });
+  }
+
+  // Cloudinary віддає файли зі свого CDN за secure_url — бекенд не проксує.
+  read(): Promise<AvatarObject> {
+    return Promise.reject(new NotFoundException());
   }
 }

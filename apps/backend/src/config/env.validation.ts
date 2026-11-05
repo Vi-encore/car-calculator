@@ -38,15 +38,27 @@ export const EnvSchema = z
     // Frontend URL
     FRONTEND_URL: z.string().url('Must be a valid URL'),
 
-    // Cloudinary (avatar uploads)
-    CLOUDINARY_CLOUD_NAME: z.string().min(1),
-    CLOUDINARY_API_KEY: z.string().min(1),
-    CLOUDINARY_API_SECRET: z.string().min(1),
+    // Сховище аватарок: cloudinary (дефолт) або s3 (AWS; креденшли — з IAM
+    // task role через default credential chain, ключів в env немає).
+    AVATAR_STORAGE: z.enum(['cloudinary', 's3']).default('cloudinary'),
+    // Cloudinary — лише коли AVATAR_STORAGE=cloudinary
+    CLOUDINARY_CLOUD_NAME: z.string().min(1).optional(),
+    CLOUDINARY_API_KEY: z.string().min(1).optional(),
+    CLOUDINARY_API_SECRET: z.string().min(1).optional(),
+    // S3 — лише коли AVATAR_STORAGE=s3
+    S3_AVATARS_BUCKET: z.string().min(1).optional(),
+    AWS_REGION: z.string().min(1).default('us-east-1'),
 
-    // Google OAuth2 (sign in with Google)
-    GOOGLE_CLIENT_ID: z.string().min(1),
-    GOOGLE_CLIENT_SECRET: z.string().min(1),
-    GOOGLE_CALLBACK_URL: z.string().url('Must be a valid URL'),
+    // Google OAuth2 (sign in with Google). Вимикач — для середовищ без
+    // HTTPS-домену (AWS-демо за ALB), куди Google не робить redirect.
+    GOOGLE_AUTH_ENABLED: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
+    // Обов'язкові лише коли GOOGLE_AUTH_ENABLED=true
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+    GOOGLE_CALLBACK_URL: z.string().url('Must be a valid URL').optional(),
 
     // Mail (password-reset codes). Провайдер: gmail (SMTP, локально) або
     // brevo (HTTP-API, прод — Render free блокує SMTP-порти).
@@ -98,6 +110,37 @@ export const EnvSchema = z
   .refine((env) => env.MAIL_PROVIDER !== 'brevo' || !!env.BREVO_API_KEY, {
     message: 'BREVO_API_KEY is required when MAIL_PROVIDER=brevo',
     path: ['BREVO_API_KEY'],
-  });
+  })
+  // Cloudinary-сховище потребує креденшлів Cloudinary.
+  .refine(
+    (env) =>
+      env.AVATAR_STORAGE !== 'cloudinary' ||
+      (!!env.CLOUDINARY_CLOUD_NAME &&
+        !!env.CLOUDINARY_API_KEY &&
+        !!env.CLOUDINARY_API_SECRET),
+    {
+      message:
+        'CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET are required when AVATAR_STORAGE=cloudinary',
+      path: ['CLOUDINARY_CLOUD_NAME'],
+    },
+  )
+  // S3-сховище потребує назви бакета.
+  .refine((env) => env.AVATAR_STORAGE !== 's3' || !!env.S3_AVATARS_BUCKET, {
+    message: 'S3_AVATARS_BUCKET is required when AVATAR_STORAGE=s3',
+    path: ['S3_AVATARS_BUCKET'],
+  })
+  // Увімкнений Google OAuth потребує креденшлів клієнта.
+  .refine(
+    (env) =>
+      !env.GOOGLE_AUTH_ENABLED ||
+      (!!env.GOOGLE_CLIENT_ID &&
+        !!env.GOOGLE_CLIENT_SECRET &&
+        !!env.GOOGLE_CALLBACK_URL),
+    {
+      message:
+        'GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL are required when GOOGLE_AUTH_ENABLED=true',
+      path: ['GOOGLE_CLIENT_ID'],
+    },
+  );
 
 export type Env = z.infer<typeof EnvSchema>;

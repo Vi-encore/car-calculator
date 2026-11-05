@@ -23,6 +23,7 @@
     "db:check": "prisma studio"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1162.0",
     "@car-calculator/types": "*",
     "@nestjs/cache-manager": "^3.1.3",
     "@nestjs/common": "^11.0.1",
