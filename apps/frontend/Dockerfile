@@ -21,6 +21,9 @@ COPY --from=pruner /app/out/full/ .
 # пріоритет над apps/frontend/.env.production (там URL Render-у).
 ARG VITE_API_URL=/api
 ENV VITE_API_URL=$VITE_API_URL
+# Google OAuth вимкнено: у демо немає HTTPS-домену (див. docs/specs/aws-s3-avatars-and-oauth-toggle.md)
+ARG VITE_GOOGLE_AUTH_ENABLED=false
+ENV VITE_GOOGLE_AUTH_ENABLED=$VITE_GOOGLE_AUTH_ENABLED
 # Напряму через npm, а не turbo: turbo у strict-режимі фільтрує env-змінні.
 RUN npm run build --workspace=frontend
 

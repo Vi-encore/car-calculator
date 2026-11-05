@@ -1,8 +1,17 @@
 // Базовий URL бекенда — той самий, що й у RTK Query (baseQuery).
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+// Build-time вимикач. AWS-демо за ALB не має HTTPS-домену, а Google не
+// приймає redirect на таку адресу → кнопка неактивна (VITE_GOOGLE_AUTH_ENABLED=false).
+const GOOGLE_AUTH_ENABLED =
+  import.meta.env.VITE_GOOGLE_AUTH_ENABLED !== "false";
+
+const BASE_CLASSES =
+  "flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700";
+
 interface GoogleButtonProps {
   readonly label?: string;
+  readonly enabled?: boolean;
 }
 
 /**
@@ -11,6 +20,7 @@ interface GoogleButtonProps {
  */
 export function GoogleButton({
   label = "Продовжити з Google",
+  enabled = GOOGLE_AUTH_ENABLED,
 }: GoogleButtonProps) {
   return (
     <>
@@ -20,13 +30,33 @@ export function GoogleButton({
         <span className="h-px flex-1 bg-slate-200" />
       </div>
 
-      <a
-        href={`${API_URL}/auth/google`}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-      >
-        <GoogleIcon />
-        {label}
-      </a>
+      {enabled ? (
+        <a
+          href={`${API_URL}/auth/google`}
+          className={`${BASE_CLASSES} transition-colors hover:bg-slate-50`}
+        >
+          <GoogleIcon />
+          {label}
+        </a>
+      ) : (
+        <>
+          <button
+            type="button"
+            disabled
+            aria-describedby="google-disabled-hint"
+            className={`${BASE_CLASSES} cursor-not-allowed opacity-50`}
+          >
+            <GoogleIcon />
+            {label}
+          </button>
+          <p
+            id="google-disabled-hint"
+            className="mt-2 text-center text-xs text-slate-400"
+          >
+            Вхід через Google недоступний у демо-середовищі
+          </p>
+        </>
+      )}
     </>
   );
 }
