@@ -8,8 +8,8 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "executionRoleArn": "arn:aws:iam::703697786238:role/focc-ecs-task-execution",
-  "taskRoleArn": "arn:aws:iam::703697786238:role/focc-ecs-task",
+  "executionRoleArn": "arn:aws:iam::703697786238:role/focc-ecs-task-execution-matiushko",
+  "taskRoleArn": "arn:aws:iam::703697786238:role/focc-ecs-task-matiushko",
   "containerDefinitions": [
     {
       "name": "backend",

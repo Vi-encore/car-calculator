@@ -14,7 +14,7 @@ access keys, термінал — лише CloudShell). Робимо **по по
 | VPC | `car-calc-vpc` |
 | Security groups | `car-calc-alb-sg`, `car-calc-ecs-sg`, `car-calc-rds-sg` |
 | S3 bucket | `focc-car-calc-avatars-<ваші ініціали>` (ім'я глобально унікальне) |
-| IAM roles | `focc-ecs-task-execution`, `focc-ecs-task` |
+| IAM roles | `focc-ecs-task-execution-matiushko`, `focc-ecs-task-matiushko` |
 | RDS | `car-calc-db` |
 | Secret | `car-calc/backend` |
 | ECR | `car-calc-backend`, `car-calc-frontend` |
@@ -62,8 +62,8 @@ S3 → **Create bucket**
 
 | Роль | Policies | Для чого |
 |---|---|---|
-| `focc-ecs-task-execution` | `AmazonECSTaskExecutionRolePolicy`, `SecretsManagerReadWrite` | ECS агент: тягне образ з ECR, пише логи, читає секрети |
-| `focc-ecs-task` | `AmazonS3FullAccess` | Сам застосунок: PutObject/GetObject в S3 |
+| `focc-ecs-task-execution-matiushko` | `AmazonECSTaskExecutionRolePolicy`, `SecretsManagerReadWrite` | ECS агент: тягне образ з ECR, пише логи, читає секрети |
+| `focc-ecs-task-matiushko` | `AmazonS3FullAccess` | Сам застосунок: PutObject/GetObject в S3 |
 
 > Власні (least-privilege) policy в акаунті створювати не можна, тому керовані.
 > Права додатково обрізає boundary. У документації описуємо, яка policy була б у
