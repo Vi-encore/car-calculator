@@ -25,7 +25,7 @@
         { "name": "API_PREFIX", "value": "api" },
         { "name": "TRUST_PROXY", "value": "true" },
         { "name": "COOKIE_MODE", "value": "same-site" },
-        { "name": "FRONTEND_URL", "value": "http://<ALB_DNS>" },
+        { "name": "FRONTEND_URL", "value": "http://car-calc-alb-matiushko-368882875.us-east-1.elb.amazonaws.com" },
         { "name": "AVATAR_STORAGE", "value": "s3" },
         { "name": "S3_AVATARS_BUCKET", "value": "focc-car-calc-avatars-matiushko" },
         { "name": "AWS_REGION", "value": "us-east-1" },
