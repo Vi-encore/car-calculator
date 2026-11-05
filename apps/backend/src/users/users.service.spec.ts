@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { UploadService } from '../upload/upload.service';
+import { IAvatarStorage } from '../upload/avatar-storage.interface';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from '@car-calculator/types';
 import * as bcrypt from 'bcrypt';
@@ -16,8 +16,8 @@ const mockPrismaService = {
   },
 };
 
-const mockUploadService = {
-  uploadAvatar: jest.fn(),
+const mockAvatarStorage = {
+  upload: jest.fn(),
 };
 
 describe('UsersService', () => {
@@ -33,8 +33,8 @@ describe('UsersService', () => {
           useValue: mockPrismaService,
         },
         {
-          provide: UploadService,
-          useValue: mockUploadService,
+          provide: IAvatarStorage,
+          useValue: mockAvatarStorage,
         },
       ],
     }).compile();

@@ -9,7 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Provider } from '@prisma/client';
 import { RegisterDto, UserSchema } from '@car-calculator/types';
 import { UpdatePasswordDto, UpdateProfileDto } from './dtos';
-import { UploadService } from '../upload/upload.service';
+import { IAvatarStorage } from '../upload/avatar-storage.interface';
 // bcrypt types did not get recognized by eslint
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const bcrypt = require('bcrypt') as typeof import('bcrypt');
@@ -18,7 +18,7 @@ const bcrypt = require('bcrypt') as typeof import('bcrypt');
 export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly uploadService: UploadService,
+    private readonly avatarStorage: IAvatarStorage,
   ) {}
 
   private async hashPassword(password: string) {
@@ -168,7 +168,7 @@ export class UsersService {
   async updateAvatar(id: string, file: Express.Multer.File) {
     if (!file) throw new BadRequestException('No file uploaded');
 
-    const avatarUrl = await this.uploadService.uploadAvatar(file);
+    const avatarUrl = await this.avatarStorage.upload(id, file);
 
     const updatedUser = await this.prismaService.user.update({
       where: { id },

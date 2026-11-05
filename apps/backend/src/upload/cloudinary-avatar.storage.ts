@@ -1,35 +1,28 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   v2 as cloudinary,
   type UploadApiErrorResponse,
   type UploadApiResponse,
 } from 'cloudinary';
-// Явно підключаємо типи multer, щоб глобальний augmentation
-// Express.Multer.File гарантовано потрапив у програму (@types/multer
-// оголошує File лише через `declare global`, без іменованого export).
-import type {} from 'multer';
+import { IAvatarStorage } from './avatar-storage.interface';
 
-@Injectable()
-export class UploadService {
-  private readonly logger = new Logger(UploadService.name);
+export class CloudinaryAvatarStorage extends IAvatarStorage {
+  private readonly logger = new Logger(CloudinaryAvatarStorage.name);
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(configService: ConfigService) {
+    super();
     cloudinary.config({
-      cloud_name: this.configService.get<string>('CLOUDINARY_CLOUD_NAME'),
-      api_key: this.configService.get<string>('CLOUDINARY_API_KEY'),
-      api_secret: this.configService.get<string>('CLOUDINARY_API_SECRET'),
+      cloud_name: configService.get<string>('CLOUDINARY_CLOUD_NAME'),
+      api_key: configService.get<string>('CLOUDINARY_API_KEY'),
+      api_secret: configService.get<string>('CLOUDINARY_API_SECRET'),
     });
   }
 
   /**
    * Стрімить файл у Cloudinary та повертає secure_url збереженого зображення.
    */
-  uploadAvatar(file: Express.Multer.File): Promise<string> {
+  upload(_userId: string, file: Express.Multer.File): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
