@@ -9,6 +9,19 @@ export const EnvSchema = z
 
     // Server port
     PORT: z.coerce.number().default(3000),
+    // Глобальний префікс маршрутів (AWS: 'api' — ALB роутить /api/* на бекенд).
+    // Порожньо = маршрути в корені (Render/локально).
+    API_PREFIX: z.string().default(''),
+    // Довіряти X-Forwarded-For від балансувальника (ALB), щоб throttler бачив
+    // реальний IP клієнта, а не IP балансувальника.
+    TRUST_PROXY: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((v) => v === 'true'),
+    // Режим refresh-cookie: cross-site (фронт і бек на різних доменах →
+    // Secure + SameSite=None) або same-site (один origin, напр. за одним ALB).
+    // Не задано → cross-site у production, same-site інакше.
+    COOKIE_MODE: z.enum(['cross-site', 'same-site']).optional(),
     // DB
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
     // Пряме (unpooled) з'єднання для міграцій на Neon; локально не потрібне

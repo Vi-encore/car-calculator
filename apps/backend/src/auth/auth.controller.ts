@@ -28,11 +28,28 @@ import type { Request, Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import type { GoogleUser } from './strategies/google.strategy';
-import { clearRefreshCookieOptions, refreshCookieOptions } from './cookie';
+import { ConfigService } from '@nestjs/config';
+import type { Env } from '../config/env.validation';
+import {
+  type CookieMode,
+  clearRefreshCookieOptions,
+  refreshCookieOptions,
+  resolveCookieMode,
+} from './cookie';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  private readonly cookieMode: CookieMode;
+
+  constructor(
+    private readonly authService: AuthService,
+    config: ConfigService<Env, true>,
+  ) {
+    this.cookieMode = resolveCookieMode(
+      config.get('COOKIE_MODE', { infer: true }),
+      config.get('NODE_ENV', { infer: true }),
+    );
+  }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -45,7 +62,11 @@ export class AuthController {
   ) {
     const { refreshToken, ...response } = await this.authService.register(dto);
 
-    res.cookie('refreshToken', refreshToken, refreshCookieOptions());
+    res.cookie(
+      'refreshToken',
+      refreshToken,
+      refreshCookieOptions(this.cookieMode),
+    );
 
     return response;
   }
@@ -61,7 +82,11 @@ export class AuthController {
   ) {
     const { refreshToken, ...response } = await this.authService.login(dto);
 
-    res.cookie('refreshToken', refreshToken, refreshCookieOptions());
+    res.cookie(
+      'refreshToken',
+      refreshToken,
+      refreshCookieOptions(this.cookieMode),
+    );
 
     return response;
   }
@@ -83,7 +108,11 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.refreshTokens(oldRefreshToken);
 
-    res.cookie('refreshToken', refreshToken, refreshCookieOptions());
+    res.cookie(
+      'refreshToken',
+      refreshToken,
+      refreshCookieOptions(this.cookieMode),
+    );
     return { accessToken };
   }
 
@@ -139,7 +168,11 @@ export class AuthController {
     const googleUser = req.user as GoogleUser;
     const { refreshToken } = await this.authService.googleLogin(googleUser);
 
-    res.cookie('refreshToken', refreshToken, refreshCookieOptions());
+    res.cookie(
+      'refreshToken',
+      refreshToken,
+      refreshCookieOptions(this.cookieMode),
+    );
 
     const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173';
     res.redirect(`${frontendUrl}/auth/callback`);
@@ -154,7 +187,7 @@ export class AuthController {
     if (refreshToken) {
       await this.authService.logout(refreshToken);
     }
-    res.clearCookie('refreshToken', clearRefreshCookieOptions());
+    res.clearCookie('refreshToken', clearRefreshCookieOptions(this.cookieMode));
     return { message: 'Logged out successfully' };
   }
 
@@ -172,7 +205,7 @@ export class AuthController {
       await this.authService.logoutAllUserSessions(refreshToken);
     }
 
-    res.clearCookie('refreshToken', clearRefreshCookieOptions());
+    res.clearCookie('refreshToken', clearRefreshCookieOptions(this.cookieMode));
     return { message: 'Logged out from all devices successfully' };
   }
 }
